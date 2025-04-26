@@ -29,6 +29,7 @@ Here are some fast facts about the MVM:
 - Since all Values can be fingerprinted in constant time, it is very easy to add accelerators for known functions. e.g. the MVM has no addition operation, but a cannonical addition function is accelerated using the hardware's addition instruction.
 - The MVM operations are defined in [`spec/op.go`](./spec/op.go).  The design favors a small amount of powerful operations over a large amount.
 
+You can read more about the MVM [here](doc/2_VM/00_VM.md).
 
 ## MycZip `myczip/`
 MycZip is a format for encoding Mycelium values so they may exist in a filesystem as a single file.
@@ -44,6 +45,8 @@ All parties are authenticated in MNP, and the cryptographic identity of each par
 
 MNP caches all transferred values, and only Values not available locally will be transferred. e.g. If you send a lot of strings, you will only have to send the type for a String (cannonically `List[Array[Bit, 8]]`) the first time, and then never again.
 
+You can read more about the MNP [here](doc/8_Protocols/02_MNP.md).
+
 
 ## Substrate `mycss/`
 A substrate is something that stores Mycelium Values and can perform computations on them according to the MVM.
@@ -55,3 +58,4 @@ A substrate, written in Go, is available in the [`mycss/`](./mycss/) directory.
 [Spore](./spore/README.md) is a programming language targetting the MVM.
 It is a data oriented language, where the emphasis is on defining Mycelium Values in a human-readable syntax.
 
+You can read more about Spore [here](doc/9_Spore/00_Spore.md)
