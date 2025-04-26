@@ -12,6 +12,7 @@ tidy: generate
 test: generate
 	mkdir -p ./build/out
 	go test -coverprofile=build/out/go-cover ./...
+	just spore/test
 
 coverage:
 	go tool cover -html ./build/out/go-cover

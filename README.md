@@ -49,3 +49,9 @@ MNP caches all transferred values, and only Values not available locally will be
 A substrate is something that stores Mycelium Values and can perform computations on them according to the MVM.
 
 A substrate, written in Go, is available in the [`mycss/`](./mycss/) directory.
+
+
+## Spore `spore/`
+[Spore](./spore/README.md) is a programming language targetting the MVM.
+It is a data oriented language, where the emphasis is on defining Mycelium Values in a human-readable syntax.
+

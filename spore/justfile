@@ -1,0 +1,3 @@
+
+test:
+	go run ../cmd/sp test stdlib/...
