@@ -37,8 +37,12 @@ func buildZipFile(ctx context.Context, pkgPath string, setEntry bool, out io.Wri
 	pkgPath = path.Clean(pkgPath)
 	pkgPath = strings.TrimPrefix(pkgPath, "./")
 	logctx.Infof(ctx, "build %v", pkgPath)
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
 	bc := build.NewContext([]build.Source{
-		{Prefix: "", FS: os.DirFS(pkgPath)},
+		{Prefix: "", FS: os.DirFS(dir)},
 		build.StdLib(),
 	})
 	return bc.WriteZip(ctx, pkgPath, setEntry, out)

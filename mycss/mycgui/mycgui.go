@@ -18,6 +18,7 @@ import (
 	"myceliumweb.org/mycelium/internal/bitbuf"
 	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
+	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/mycss"
@@ -90,10 +91,12 @@ func RenderFrame(ctx context.Context, pctx mycss.ProcCtx, ops *op.Ops, port *myc
 	ops.Reset()
 
 	laz, err := mycexpr.BuildLazy(myc.ProductType{}, func(eb mycexpr.EB) *mycexpr.Expr {
-		return eb.Apply(
-			GetRenderExpr(mycexpr.Param(0), "GUI"),
-			eb.Product(eb.P(0), eb.Lit(port)),
-		)
+		return myccanon.LetNS(pctx.NS(), func(eb myccanon.EB) *myccanon.Expr {
+			return eb.Apply(
+				GetRenderExpr(eb.P(0), "GUI"),
+				eb.Product(eb.P(0), eb.Lit(port)),
+			)
+		})
 	})
 	if err != nil {
 		return err
