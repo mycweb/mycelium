@@ -1,0 +1,48 @@
+<div class="pod">
+    <p>
+        <b>ID: </b> {{ .Pod.ID }} |
+        <b>Created At: </b> {{.Pod.CreatedAt}}
+    </p>
+    <div>
+        <h3>Config</h3>
+        <code>
+            {{ .Pod.Config }}
+        </code>
+    </div>
+    <div>
+        <h3>Processes</h2>
+        <p><b>Total: </b> {{ .Pod.ProcCount}} </p>
+    </div>
+    <div class="pod-ns">
+        <h3>NAMESPACE</h3>
+        <table>
+            <tr>
+                <th>KEY</th>
+                <th>TYPE</th>
+                <th>PRETTY</th>
+                <th>BITS</th>
+                <th>HEX</th>
+            </tr>
+            {{ range $ent := .Pod.NS }}
+                <tr class="code-mono">
+                    <td>{{ $ent.Key }}</td>
+                    <td>{{ $ent.Value.Type }}</td>
+                    <td>{{ $ent.Value.Pretty}}</td>
+                    <td>{{ $ent.Value.Bits}}</td>
+                    <td><code>{{ $ent.Value.Raw | hexDump }}</code></td>
+                </tr>
+            {{end}}
+        </table>
+    </div>
+
+    <div>
+        {{ template "view/pod_app" . }}
+    </div>
+
+    <div>
+        <h3>DANGER ZONE</h3>
+        <form action="/pod/{{ .Pod.ID }}/drop", method="post">
+            <input type="submit" value="DROP POD"/>
+        </form>
+    </div> 
+</div>

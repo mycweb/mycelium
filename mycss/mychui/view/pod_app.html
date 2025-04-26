@@ -1,0 +1,28 @@
+<div class="app-sandbox">
+    <iframe id="app-sandbox" class="app-sandbox"></iframe>
+    <script>
+        let sandbox = document.getElementById("app-sandbox"); 
+        function update(prev, next, content) {
+            if (content === undefined) {
+                content = ""
+            }
+            if (prev === "" || prev === undefined) {
+                elem = sandbox.contentWindow.document.documentElement; 
+            } else {
+                elem = sandbox.contentWindow.document.getElementById(prev);
+            }
+            elem.id = next;
+            elem.innerHTML = content;
+        }
+
+        update("", "", "<p>LOADING...</p>");
+        let ws = new WebSocket("/v1/pod/{{ .Pod.ID }}/ws");
+        ws.onerror = function(err) {
+            alert(err);
+        };
+        ws.onmessage = function(msg) {
+            let msg2 = JSON.parse(msg.data);
+            update(msg2.prev, msg2.next, msg2.data)
+        };
+    </script>
+</div>

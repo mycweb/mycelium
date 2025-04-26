@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Mycelium @ {{ .Hostname }}</title>
+        <style>
+            body {
+                color: whitesmoke;
+                background-color: #151216;
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+            .code-mono {
+                font-family: 'Courier New', Courier, monospace;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            td {
+                border: 1px solid;
+            }
+            .pod-ns {
+                min-height: 100px;
+                border: 1px solid;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            .app-sandbox {
+                background-color: white;
+                min-width: 100%;
+                min-height: 200px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>MYCELIUM</h1>
+        <div class="navbar">
+            <a href="/">Home</a> 
+        </div>
+        <div class="app">
+            {{ embed }}
+        </div>
+    </body>
+</html>

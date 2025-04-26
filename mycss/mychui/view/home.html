@@ -1,0 +1,22 @@
+<div class="home">
+    <h2>Pods</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Entries</th>
+                <th>Processes</th>
+                <th>Created At</th>
+            </tr>
+            {{ range .Pods }}
+                <tr>
+                    <td><a href="/pod/{{.ID}}">{{ .ID }}</a></td>
+                    <td>{{ .NSCount }}</td>
+                    <td>{{ .ProcCount }}</td>
+                    <td>{{ .CreatedAt }}</td>
+                </tr>
+            {{ end }}
+        </table>
+        <form action="/pod", method="post">
+            <input type="submit" value="Create Pod"/>
+        </form>
+</div>

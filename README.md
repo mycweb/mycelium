@@ -43,3 +43,9 @@ Built on [QUIC](https://en.wikipedia.org/wiki/QUIC), it is a peer-to-peer messag
 All parties are authenticated in MNP, and the cryptographic identity of each party has a cannonical representation as a Mycelium Value (called a Peer).
 
 MNP caches all transferred values, and only Values not available locally will be transferred. e.g. If you send a lot of strings, you will only have to send the type for a String (cannonically `List[Array[Bit, 8]]`) the first time, and then never again.
+
+
+## Substrate `mycss/`
+A substrate is something that stores Mycelium Values and can perform computations on them according to the MVM.
+
+A substrate, written in Go, is available in the [`mycss/`](./mycss/) directory.
