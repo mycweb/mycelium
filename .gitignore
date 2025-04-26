@@ -1,0 +1,9 @@
+# used for derived artifacts
+build/out
+
+# common data files used by mycelium
+**.db
+*.zip
+
+*.prof
+*.test
