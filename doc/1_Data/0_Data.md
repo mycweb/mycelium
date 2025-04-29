@@ -1,10 +1,10 @@
-# Mycelium
+# Mycelium Data Types
 
 Mycelium is first and foremost a data serialization format.
 
 There are many serialization formats, here is what makes Mycelium special:
   - Serializes typed data, with full type erasure.
-    Sender and receiever must both have the type.
+    Sender and receiver must both have the type.
   - Allows references to data, data does not have to be flattened to be serialized.
   - Supports sending functions
   - All Values can be fingerprinted in constant time.  Equal values will always have the same Fingerprint.
@@ -19,4 +19,4 @@ Here are a few key facts about Mycelium's type system.
 
 There are only a few Kinds, each section in this Chapter will describe a different *Kind*.
 
-Mycelium Values have a modest maximum size, this is a [System](./70_System.md) parameter, with `2^21 bytes` or `2^24 bits` used in practice.
+Mycelium Values have a modest maximum size, this is a [System](./70_System.md) parameter, with `2^24 bits` used in the reference implementations.

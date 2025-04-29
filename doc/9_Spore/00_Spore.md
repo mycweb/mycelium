@@ -1,5 +1,5 @@
 # Spore
-Spore is a homo-iconic programming language which compiles to Mycelium Values.
+Spore is a programming language which compiles to Mycelium Values.
 
 Spore cosmentically resembles a LISP.
 It emphasizes easily defining Mycelium Values in a human readable way.
