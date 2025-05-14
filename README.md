@@ -1,6 +1,6 @@
 # Mycelium
 
-Mycelium is a set of typed formats for storing and transferring data.
+Mycelium is a set of typed formats for storing and transferring data, like [Protocol Buffers](https://protobuf.dev/) or JSON.
 As you might expect it supports things like:
 - Bits
 - Arrays
