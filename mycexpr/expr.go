@@ -103,7 +103,7 @@ func (e *Expr) IsLiteral() bool {
 }
 
 func (e *Expr) IsLiteralBits() bool {
-	return e.op >= spec.LiteralB2 && e.op <= spec.LiteralB256
+	return e.op >= spec.LiteralB0 && e.op <= spec.LiteralB256
 }
 
 func (e *Expr) IsParam() bool {
@@ -538,6 +538,11 @@ func literalKind(k *myc.Kind) *Expr {
 func literalBits(x myc.AsBitArray) *Expr {
 	l := x.AsBitArray().Len()
 	switch l {
+	case 0:
+		return &Expr{
+			op:      spec.LiteralB0,
+			literal: x,
+		}
 	case 2, 4, 8, 16, 32, 64, 128, 256:
 		return &Expr{
 			op:      spec.LiteralB2 + spec.Op(bits.TrailingZeros(uint(l))-1),

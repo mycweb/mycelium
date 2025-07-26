@@ -27,6 +27,8 @@ var infos = func() (ret [1 << 16]Info) {
 		Uncraft: {1},
 		TypeOf:  {1},
 		SizeOf:  {1},
+		Encode:  {1},
+		Decode:  {2},
 
 		Let:    {2},
 		Mux:    {2},
@@ -60,9 +62,9 @@ var infos = func() (ret [1 << 16]Info) {
 		Output:   {2},
 		Interact: {2},
 
+		Gather:   {1},
 		ListFrom: {1},
 		ListTo:   {2},
-		Gather:   {1},
 
 		AnyValueFrom: {1},
 		AnyValueTo:   {2},
@@ -70,11 +72,11 @@ var infos = func() (ret [1 << 16]Info) {
 		AnyTypeTo:    {1},
 
 		// Accessors
-		Len:   {1},
-		Field: {2},
-		Slot:  {2},
-		Slice: {3},
-		Which: {1},
+		Len:     {1},
+		Field:   {2},
+		Slot:    {2},
+		Section: {3},
+		Which:   {1},
 
 		// Array Compute
 		Map:    {2},

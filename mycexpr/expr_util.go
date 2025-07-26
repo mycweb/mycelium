@@ -157,15 +157,25 @@ func (eb EB) Concat(left, right *Expr) *Expr {
 
 func (eb EB) List(xs ...*Expr) *Expr {
 	if len(xs) == 0 {
-		return newExpr(spec.ListFrom, eb.Post(eb.Array(eb.Bottom())))
+		return eb.ListFrom(eb.Post(eb.Array(eb.Bottom())))
 	}
-	return newExpr(spec.ListFrom, eb.Post(eb.Array(eb.TypeOf(xs[0]), xs...)))
+	return eb.ListFrom(eb.Post(eb.Array(eb.TypeOf(xs[0]), xs...)))
 }
 
+func (eb EB) Encode(x *Expr) *Expr {
+	return newExpr(spec.Encode, x)
+}
+
+func (eb EB) Decode(ty *Expr, data *Expr) *Expr {
+	return newExpr(spec.Decode, ty, data)
+}
+
+// ListFrom takes a Ref[Array[T, _]] and returns a List[T]
 func (eb EB) ListFrom(x *Expr) *Expr {
 	return newExpr(spec.ListFrom, x)
 }
 
+// ListTo takes a List[T] and returns a Ref[Array[T, n]]
 func (eb EB) ListTo(x *Expr, n int) *Expr {
 	return newExpr(spec.ListTo, x, eb.B32(uint32(n)))
 }
@@ -179,7 +189,11 @@ func (eb EB) Apply(la *Expr, arg *Expr) *Expr {
 	return newExpr(spec.Apply, la, arg)
 }
 
-func (eb EB) Unmake(ty *Expr) *Expr {
+func (eb EB) Craft(ty *Expr, x *Expr) *Expr {
+	return newExpr(spec.Craft, ty, x)
+}
+
+func (eb EB) Uncraft(ty *Expr) *Expr {
 	return newExpr(spec.Uncraft, ty)
 }
 
@@ -228,11 +242,11 @@ func (eb EB) ArrayType(ty, l *Expr) *Expr {
 }
 
 func (eb EB) ArrayTypeElem(ty *Expr) *Expr {
-	return eb.Field(eb.Unmake(ty), 0)
+	return eb.Field(eb.Uncraft(ty), 0)
 }
 
 func (eb EB) ArrayTypeLen(ty *Expr) *Expr {
-	return eb.Field(eb.Unmake(ty), 1)
+	return eb.Field(eb.Uncraft(ty), 1)
 }
 
 func (eb EB) ListType(ty *Expr) *Expr {
@@ -241,7 +255,7 @@ func (eb EB) ListType(ty *Expr) *Expr {
 }
 
 func (eb EB) ListTypeElem(ty *Expr) *Expr {
-	return eb.Field(eb.Unmake(ty), 0)
+	return eb.Field(eb.Uncraft(ty), 0)
 }
 
 func (eb EB) RefType(elem *Expr) *Expr {
@@ -250,7 +264,7 @@ func (eb EB) RefType(elem *Expr) *Expr {
 }
 
 func (eb EB) RefTypeElem(x *Expr) *Expr {
-	return eb.Field(eb.Unmake(x), 0)
+	return eb.Field(eb.Uncraft(x), 0)
 }
 
 func (eb EB) LazyType(elem *Expr) *Expr {
@@ -279,11 +293,11 @@ func (eb EB) DistinctType(base, mark *Expr) *Expr {
 }
 
 func (eb EB) DistinctTypeBase(x *Expr) *Expr {
-	return eb.Field(eb.Unmake(x), 0)
+	return eb.Field(eb.Uncraft(x), 0)
 }
 
 func (eb EB) DistinctTypeMarkExpr(x *Expr) *Expr {
-	return eb.Field(eb.Unmake(x), 1)
+	return eb.Field(eb.Uncraft(x), 1)
 }
 
 func (eb EB) PortType(tell, recv, req, resp *Expr) *Expr {
@@ -340,6 +354,14 @@ func (eb EB) Field(x *Expr, i int) *Expr {
 
 func (EB) Slot(x *Expr, idx *Expr) *Expr {
 	return newExpr(spec.Slot, x, idx)
+}
+
+func (eb EB) Section(x *Expr, beg, end int) *Expr {
+	return newExpr(spec.Section, x, eb.B32(uint32(beg)), eb.B32(uint32(end)))
+}
+
+func (eb EB) Slice(x *Expr, beg, end *Expr) *Expr {
+	return newExpr(spec.Slice, x, beg, end)
 }
 
 // Arg refers to a Product field in the Product at %0

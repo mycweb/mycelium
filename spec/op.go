@@ -32,6 +32,10 @@ const (
 	Fingerprint
 	// Root: () -> Type2
 	Root
+	// Encode: (x: T) -> Array[Bit, SizeOf(T)]
+	Encode
+	// Decode: (T: Type, data: Array[Bit, SizeOf(T)]) -> T
+	Decode
 )
 
 const (
@@ -95,8 +99,10 @@ const (
 	Field
 	// Slot returns a value in an Array or List
 	Slot
-	// Slice returns a contiguous range of an Array or List
-	Slice
+	// Section returns a contiguous range of an Array.
+	// Section (x: Array[T, l], beg: Size, end: Size) -> Array[T, end - beg]
+	// beg and end must be known at compile time
+	Section
 )
 
 const (
@@ -126,11 +132,12 @@ const (
 )
 
 const (
-	// Map: (elemIn: Type, x Array[ty], fn (elemIn) -> elemOut) Array[elemOut]
+	// Map: (elemIn: Type, x Array[ty, _], fn (elemIn) -> elemOut) Array[elemOut, _]
 	Map Op = 4*section + iota
-	// Reduce: (elem: Type, x Array[elem], fn (left, right elem) -> elem ) elem
+	// Reduce: (elem: Type, x Array[elem, _], fn (left, right elem) -> elem ) elem
 	Reduce
 	// Zip: (left Array[Left, l], right Array[Right, l]) Array[Product[Left, Right], l]
+	// DEPRECATED
 	Zip
 	// Fold: (x Array[T], init Acc, fn *Lambda[Product[Acc, T], Acc]) Acc
 	Fold
@@ -153,25 +160,39 @@ const (
 )
 
 const (
-	// ListFrom: (x: Ref[Array[T, l]]) -> List[T]
-	ListFrom Op = 7*section + iota
-	// ListTo: (x: List[T], l: Size) -> Ref[Array[T, l]]
-	ListTo
 	// Gather: (x Array[List[T], _]) -> List[T]
-	Gather
+	Gather Op = 7*section + iota
+	// Slice (x List[T], beg: Size, end: Size) -> List[T]
+	// Slice returns a List containing the elements in x from beg (inclusive) to end (exclusive)
+	// If beg or end are out of bounds, Slice will panic.
+	// If end is < beg, slice will panic.
+	Slice
+
+	// ListFrom
+	// DEPRECATED
+	ListFrom
+	// ListTo
+	// DEPRECATED
+	ListTo
 
 	// AnyTypeFrom: (x: Type) -> AnyType
+	// DEPRECATED
 	AnyTypeFrom
 	// AnyTypeTo: (x: Kind) -> x
+	// DEPRECATED
 	AnyTypeTo
 	// AnyTypeElemType: (x: AnyType) -> Kind
+	// DEPRECATED
 	AnyTypeElemType
 
 	// AnyValueFrom: (x: _) -> AnyValue
+	// DEPRECATED
 	AnyValueFrom
 	// AnyValueTo: (x: AnyValue, ty: Type) -> Type
+	// DEPRECATED
 	AnyValueTo
 	// AnyValueElemType: (x: AnyValue) -> AnyType
+	// DEPRECATED
 	AnyValueElemType
 )
 
@@ -188,7 +209,8 @@ const (
 )
 
 const (
-	LiteralB2 Op = 128 + 8 + iota
+	LiteralB0 Op = 128 + 8 + iota
+	LiteralB2
 	LiteralB4
 	LiteralB8
 	LiteralB16

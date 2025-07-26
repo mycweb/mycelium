@@ -188,6 +188,8 @@ func (c *Compiler) compile(ctx context.Context, mc machCtx, x myc.Prog) (*Prog, 
 		return c.compileAnyTypeTo(ctx, mc, x.Input(0), x.Input(1))
 	case spec.AnyValueTo:
 		return c.compileAnyValueTo(ctx, mc, x.Input(0), x.Input(1))
+	case spec.Decode:
+		return c.compileDecode(ctx, mc, x.Input(0), x.Input(1))
 	}
 
 	// The rest of the operations should all be uniform in:
@@ -370,6 +372,37 @@ func (c *Compiler) compileAnyValueTo(ctx context.Context, mc machCtx, a0, a1 myc
 			to:         toAT,
 			outputBits: size,
 		}),
+	}, nil
+}
+
+func (c *Compiler) compileEncode(ctx context.Context, input Type) (*Prog, error) {
+	at, err := c.arrayType(ctx, c.bitType(), input.Size)
+	if err != nil {
+		return nil, err
+	}
+	return &Prog{
+		Type: at,
+	}, nil
+}
+
+func (c *Compiler) compileDecode(ctx context.Context, mc machCtx, tyE, dataE myc.Prog) (*Prog, error) {
+	ty, err := c.evalTypeNow(ctx, mc, tyE)
+	if err != nil {
+		return nil, err
+	}
+	dataProg, err := c.compile(ctx, mc, dataE)
+	if err != nil {
+		return nil, err
+	}
+	if dataProg.Type.Type2.TypeCode() != spec.TC_Array {
+		return nil, fmt.Errorf("mvm1.compileDecode: arg[1] must be an Array[Bit, _]")
+	}
+	if dataProg.Type.Size != ty.Size {
+		return nil, fmt.Errorf("mvm1.compileDecode: data must be same size as type")
+	}
+	return &Prog{
+		Type: ty,
+		I:    dataProg.I,
 	}, nil
 }
 
@@ -594,6 +627,8 @@ func (c *Compiler) compileSimple(ctx context.Context, mc machCtx, code spec.Op, 
 			Type: ty,
 			I:    []I{sizeOfI{}},
 		}, nil
+	case spec.Encode:
+		return c.compileEncode(ctx, argTypes[0])
 	case spec.ProductEmpty:
 		pt, err := c.makeHType(ctx, spec.TC_Product, nil)
 		if err != nil {

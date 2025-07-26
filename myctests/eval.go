@@ -5,6 +5,7 @@ import (
 
 	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mycexpr"
+	"myceliumweb.org/mycelium/mycmem"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 )
@@ -34,6 +35,7 @@ func EvalVecs(s cadata.PostExister) (out []EvalVec) {
 		typeOfEval,
 		lenEval,
 		listEval,
+		codecEval,
 		miscEval,
 	} {
 		out = addVecs(out, s)
@@ -421,6 +423,22 @@ func miscEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 				eb.ArrayType(eb.Lit(myc.B8Type()), eb.B32(100)),
 			),
 			O: b32(100),
+		},
+	}...)
+}
+
+func codecEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+	eb := EB{}
+	return append(out, []EvalVec{
+		{
+			Name: "Encode4Bit",
+			I:    eb.Encode(eb.Lit(mycmem.Product{bit(0), bit(1), bit(0), bit(1)})),
+			O:    mycmem.NewBitArray(0, 1, 0, 1),
+		},
+		{
+			Name: "Decode4Bit",
+			I:    eb.Decode(eb.ProductType(eb.BitType(), eb.BitType(), eb.BitType()), eb.Lit(mycmem.NewBitArray(1, 0, 1))),
+			O:    mycmem.Product{bit(1), bit(0), bit(1)},
 		},
 	}...)
 }

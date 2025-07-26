@@ -18,6 +18,8 @@ func _() {
 	_ = x[MaxSize-7]
 	_ = x[Fingerprint-8]
 	_ = x[Root-9]
+	_ = x[Encode-10]
+	_ = x[Decode-11]
 	_ = x[ZERO-16]
 	_ = x[ONE-31]
 	_ = x[ArrayEmpty-32]
@@ -30,7 +32,7 @@ func _() {
 	_ = x[Which-39]
 	_ = x[Field-40]
 	_ = x[Slot-41]
-	_ = x[Slice-42]
+	_ = x[Section-42]
 	_ = x[Let-48]
 	_ = x[Lazy-49]
 	_ = x[Lambda-50]
@@ -50,32 +52,34 @@ func _() {
 	_ = x[Input-96]
 	_ = x[Output-97]
 	_ = x[Interact-98]
-	_ = x[ListFrom-112]
-	_ = x[ListTo-113]
-	_ = x[Gather-114]
-	_ = x[AnyTypeFrom-115]
-	_ = x[AnyTypeTo-116]
-	_ = x[AnyTypeElemType-117]
-	_ = x[AnyValueFrom-118]
-	_ = x[AnyValueTo-119]
-	_ = x[AnyValueElemType-120]
+	_ = x[Gather-112]
+	_ = x[Slice-113]
+	_ = x[ListFrom-114]
+	_ = x[ListTo-115]
+	_ = x[AnyTypeFrom-116]
+	_ = x[AnyTypeTo-117]
+	_ = x[AnyTypeElemType-118]
+	_ = x[AnyValueFrom-119]
+	_ = x[AnyValueTo-120]
+	_ = x[AnyValueElemType-121]
 	_ = x[Self-128]
 	_ = x[LiteralKind-129]
 	_ = x[LiteralAnyType-130]
 	_ = x[LiteralAnyValue-131]
-	_ = x[LiteralB2-136]
-	_ = x[LiteralB4-137]
-	_ = x[LiteralB8-138]
-	_ = x[LiteralB16-139]
-	_ = x[LiteralB32-140]
-	_ = x[LiteralB64-141]
-	_ = x[LiteralB128-142]
-	_ = x[LiteralB256-143]
+	_ = x[LiteralB0-136]
+	_ = x[LiteralB2-137]
+	_ = x[LiteralB4-138]
+	_ = x[LiteralB8-139]
+	_ = x[LiteralB16-140]
+	_ = x[LiteralB32-141]
+	_ = x[LiteralB64-142]
+	_ = x[LiteralB128-143]
+	_ = x[LiteralB256-144]
 	_ = x[Param0-192]
 	_ = x[ParamN-255]
 }
 
-const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumLenWhichFieldSlotSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicMapReduceZipFoldPostLoadInputOutputInteractListFromListToGatherAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
+const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumLenWhichFieldSlotSectionLetLazyLambdaFractalEvalApplyMuxBranchTryPanicMapReduceZipFoldPostLoadInputOutputInteractGatherSliceListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
 
 var _Op_map = map[Op]string{
 	0:   _Op_name[0:7],
@@ -88,61 +92,65 @@ var _Op_map = map[Op]string{
 	7:   _Op_name[40:47],
 	8:   _Op_name[47:58],
 	9:   _Op_name[58:62],
-	16:  _Op_name[62:66],
-	31:  _Op_name[66:69],
-	32:  _Op_name[69:79],
-	33:  _Op_name[79:88],
-	34:  _Op_name[88:100],
-	35:  _Op_name[100:111],
-	36:  _Op_name[111:117],
-	37:  _Op_name[117:124],
-	38:  _Op_name[124:127],
-	39:  _Op_name[127:132],
-	40:  _Op_name[132:137],
-	41:  _Op_name[137:141],
-	42:  _Op_name[141:146],
-	48:  _Op_name[146:149],
-	49:  _Op_name[149:153],
-	50:  _Op_name[153:159],
-	51:  _Op_name[159:166],
-	52:  _Op_name[166:170],
-	53:  _Op_name[170:175],
-	54:  _Op_name[175:178],
-	55:  _Op_name[178:184],
-	56:  _Op_name[184:187],
-	57:  _Op_name[187:192],
-	64:  _Op_name[192:195],
-	65:  _Op_name[195:201],
-	66:  _Op_name[201:204],
-	67:  _Op_name[204:208],
-	80:  _Op_name[208:212],
-	81:  _Op_name[212:216],
-	96:  _Op_name[216:221],
-	97:  _Op_name[221:227],
-	98:  _Op_name[227:235],
-	112: _Op_name[235:243],
-	113: _Op_name[243:249],
-	114: _Op_name[249:255],
-	115: _Op_name[255:266],
-	116: _Op_name[266:275],
-	117: _Op_name[275:290],
-	118: _Op_name[290:302],
-	119: _Op_name[302:312],
-	120: _Op_name[312:328],
-	128: _Op_name[328:332],
-	129: _Op_name[332:343],
-	130: _Op_name[343:357],
-	131: _Op_name[357:372],
-	136: _Op_name[372:381],
-	137: _Op_name[381:390],
-	138: _Op_name[390:399],
-	139: _Op_name[399:409],
-	140: _Op_name[409:419],
-	141: _Op_name[419:429],
-	142: _Op_name[429:440],
-	143: _Op_name[440:451],
-	192: _Op_name[451:457],
-	255: _Op_name[457:463],
+	10:  _Op_name[62:68],
+	11:  _Op_name[68:74],
+	16:  _Op_name[74:78],
+	31:  _Op_name[78:81],
+	32:  _Op_name[81:91],
+	33:  _Op_name[91:100],
+	34:  _Op_name[100:112],
+	35:  _Op_name[112:123],
+	36:  _Op_name[123:129],
+	37:  _Op_name[129:136],
+	38:  _Op_name[136:139],
+	39:  _Op_name[139:144],
+	40:  _Op_name[144:149],
+	41:  _Op_name[149:153],
+	42:  _Op_name[153:160],
+	48:  _Op_name[160:163],
+	49:  _Op_name[163:167],
+	50:  _Op_name[167:173],
+	51:  _Op_name[173:180],
+	52:  _Op_name[180:184],
+	53:  _Op_name[184:189],
+	54:  _Op_name[189:192],
+	55:  _Op_name[192:198],
+	56:  _Op_name[198:201],
+	57:  _Op_name[201:206],
+	64:  _Op_name[206:209],
+	65:  _Op_name[209:215],
+	66:  _Op_name[215:218],
+	67:  _Op_name[218:222],
+	80:  _Op_name[222:226],
+	81:  _Op_name[226:230],
+	96:  _Op_name[230:235],
+	97:  _Op_name[235:241],
+	98:  _Op_name[241:249],
+	112: _Op_name[249:255],
+	113: _Op_name[255:260],
+	114: _Op_name[260:268],
+	115: _Op_name[268:274],
+	116: _Op_name[274:285],
+	117: _Op_name[285:294],
+	118: _Op_name[294:309],
+	119: _Op_name[309:321],
+	120: _Op_name[321:331],
+	121: _Op_name[331:347],
+	128: _Op_name[347:351],
+	129: _Op_name[351:362],
+	130: _Op_name[362:376],
+	131: _Op_name[376:391],
+	136: _Op_name[391:400],
+	137: _Op_name[400:409],
+	138: _Op_name[409:418],
+	139: _Op_name[418:427],
+	140: _Op_name[427:437],
+	141: _Op_name[437:447],
+	142: _Op_name[447:457],
+	143: _Op_name[457:468],
+	144: _Op_name[468:479],
+	192: _Op_name[479:485],
+	255: _Op_name[485:491],
 }
 
 func (i Op) String() string {
