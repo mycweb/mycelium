@@ -190,7 +190,7 @@ const (
 	LiteralB16  Op = 192 + 2 - 1
 	LiteralB32  Op = 192 + 4 - 1
 	LiteralB64  Op = 192 + 8 - 1
-	Literal128  Op = 192 + 16 - 1
+	LiteralB128 Op = 192 + 16 - 1
 	LiteralB256 Op = 192 + 32 - 1
 )
 

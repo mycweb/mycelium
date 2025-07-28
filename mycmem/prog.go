@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"iter"
-	"math/bits"
 	"slices"
 	"strings"
 
@@ -217,7 +216,9 @@ func encodeProg(out []byte, prog Prog) ([]byte, error) {
 			if node.IsCode(spec.ParamN) {
 				out = binary.AppendUvarint(out, uint64(node.param))
 			}
-		case node.IsCode(spec.LiteralB2, spec.LiteralB4, spec.LiteralB8):
+		case node.code >= spec.LiteralB0 && node.code <= spec.LiteralB4_1111:
+			// no additional bytes
+		case node.IsCode(spec.LiteralB8):
 			out = append(out, node.litBits[:1]...)
 		case node.IsCode(spec.LiteralB16):
 			out = append(out, node.litBits[:2]...)
@@ -285,9 +286,12 @@ func decodeNode(dst *Node, idx uint32, src []byte, load LoadFunc) (int, error) {
 		return n, nil
 	}
 
+	if opc >= spec.LiteralB0 && opc <= spec.LiteralB4_1111 {
+		panic("not implemented")
+	}
 	switch opc {
 	case spec.Self:
-	case spec.LiteralB2, spec.LiteralB4, spec.LiteralB8:
+	case spec.LiteralB8:
 		dst.litBits = append(dst.litBits[:0], src[:1]...)
 		n += 1
 	case spec.LiteralB16:
@@ -395,11 +399,11 @@ func literalKind(k *Kind) Node {
 func literalBits(x AsBitArray) Node {
 	l := x.AsBitArray().Len()
 	switch l {
-	case 2, 4, 8, 16, 32, 64, 128, 256:
+	case 8, 16, 32, 64, 128, 256:
 		bb := bitbuf.New(l)
 		x.Encode(bb)
 		return Node{
-			code:    spec.LiteralB2 + spec.Op(bits.TrailingZeros(uint(l))-1),
+			code:    spec.LiteralBytes(l / 8),
 			litBits: bb.Bytes(),
 		}
 	default:
@@ -456,7 +460,7 @@ func (n Node) IsLiteral() bool {
 }
 
 func (n Node) IsLiteralBits() bool {
-	return n.code >= spec.LiteralB2 && n.code <= spec.LiteralB256
+	return n.code >= spec.LiteralB8
 }
 
 func (n Node) IsParam() bool {
@@ -476,11 +480,10 @@ func (n Node) Param() uint32 {
 }
 
 func (node Node) Literal() Value {
+	if node.code >= spec.LiteralB0 && node.code <= spec.LiteralB4_1111 {
+		panic("not implemented")
+	}
 	switch node.code {
-	case spec.LiteralB2:
-		return decodeBitArray(bitbuf.FromBytes(node.litBits).Slice(0, 2))
-	case spec.LiteralB4:
-		return decodeBitArray(bitbuf.FromBytes(node.litBits).Slice(0, 4))
 	case spec.LiteralB8, spec.LiteralB16, spec.LiteralB32, spec.LiteralB64, spec.LiteralB128, spec.LiteralB256:
 		l := 8 << (node.code - spec.LiteralB8)
 		return decodeBitArray(bitbuf.FromBytes(node.litBits).Slice(0, l))
@@ -506,7 +509,9 @@ func (n Node) Size() int {
 		} else {
 			return spec.OpBits
 		}
-	case n.code >= spec.LiteralB2 && n.code <= spec.LiteralB8:
+	case n.code >= spec.LiteralB0 && n.code <= spec.LiteralB4_1111:
+		panic("not implemented")
+	case n.code == spec.LiteralB8:
 		return spec.OpBits + 1*8
 	case n.code == spec.LiteralB16:
 		return spec.OpBits + 2*8

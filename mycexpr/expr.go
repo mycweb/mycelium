@@ -560,7 +560,7 @@ func literalBits(x myc.AsBitArray) *Expr {
 		}
 	case 8, 16, 32, 64, 128, 256:
 		return &Expr{
-			op:      spec.LiteralBytes(l),
+			op:      spec.LiteralBytes(l / 8),
 			literal: x,
 		}
 	default:

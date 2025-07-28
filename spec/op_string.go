@@ -73,7 +73,7 @@ func _() {
 	_ = x[LiteralB16-193]
 	_ = x[LiteralB32-195]
 	_ = x[LiteralB64-199]
-	_ = x[Literal128-207]
+	_ = x[LiteralB128-207]
 	_ = x[LiteralB256-223]
 	_ = x[LiteralB0-224]
 	_ = x[LiteralB1_0-226]
@@ -108,7 +108,7 @@ func _() {
 	_ = x[LiteralB4_1111-255]
 }
 
-const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicSelfPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeParam0ParamNZEROONELiteralKindLiteralArrayTypeLiteralRefTypeLiteralListTypeLiteralLazyTypeLiteralLambdaTypeLiteralPortTypeLiteralAnyTypeLiteralAnyValueLiteralB8LiteralB16LiteralB32LiteralB64Literal128LiteralB256LiteralB0LiteralB1_0LiteralB1_1LiteralB2_00LiteralB2_01LiteralB2_10LiteralB2_11LiteralB3_000LiteralB3_001LiteralB3_010LiteralB3_011LiteralB3_100LiteralB3_101LiteralB3_110LiteralB3_111LiteralB4_0000LiteralB4_0001LiteralB4_0010LiteralB4_0011LiteralB4_0100LiteralB4_0101LiteralB4_0110LiteralB4_0111LiteralB4_1000LiteralB4_1001LiteralB4_1010LiteralB4_1011LiteralB4_1100LiteralB4_1101LiteralB4_1110LiteralB4_1111"
+const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicSelfPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeParam0ParamNZEROONELiteralKindLiteralArrayTypeLiteralRefTypeLiteralListTypeLiteralLazyTypeLiteralLambdaTypeLiteralPortTypeLiteralAnyTypeLiteralAnyValueLiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256LiteralB0LiteralB1_0LiteralB1_1LiteralB2_00LiteralB2_01LiteralB2_10LiteralB2_11LiteralB3_000LiteralB3_001LiteralB3_010LiteralB3_011LiteralB3_100LiteralB3_101LiteralB3_110LiteralB3_111LiteralB4_0000LiteralB4_0001LiteralB4_0010LiteralB4_0011LiteralB4_0100LiteralB4_0101LiteralB4_0110LiteralB4_0111LiteralB4_1000LiteralB4_1001LiteralB4_1010LiteralB4_1011LiteralB4_1100LiteralB4_1101LiteralB4_1110LiteralB4_1111"
 
 var _Op_map = map[Op]string{
 	0:   _Op_name[0:7],
@@ -176,39 +176,39 @@ var _Op_map = map[Op]string{
 	193: _Op_name[485:495],
 	195: _Op_name[495:505],
 	199: _Op_name[505:515],
-	207: _Op_name[515:525],
-	223: _Op_name[525:536],
-	224: _Op_name[536:545],
-	226: _Op_name[545:556],
-	227: _Op_name[556:567],
-	228: _Op_name[567:579],
-	229: _Op_name[579:591],
-	230: _Op_name[591:603],
-	231: _Op_name[603:615],
-	232: _Op_name[615:628],
-	233: _Op_name[628:641],
-	234: _Op_name[641:654],
-	235: _Op_name[654:667],
-	236: _Op_name[667:680],
-	237: _Op_name[680:693],
-	238: _Op_name[693:706],
-	239: _Op_name[706:719],
-	240: _Op_name[719:733],
-	241: _Op_name[733:747],
-	242: _Op_name[747:761],
-	243: _Op_name[761:775],
-	244: _Op_name[775:789],
-	245: _Op_name[789:803],
-	246: _Op_name[803:817],
-	247: _Op_name[817:831],
-	248: _Op_name[831:845],
-	249: _Op_name[845:859],
-	250: _Op_name[859:873],
-	251: _Op_name[873:887],
-	252: _Op_name[887:901],
-	253: _Op_name[901:915],
-	254: _Op_name[915:929],
-	255: _Op_name[929:943],
+	207: _Op_name[515:526],
+	223: _Op_name[526:537],
+	224: _Op_name[537:546],
+	226: _Op_name[546:557],
+	227: _Op_name[557:568],
+	228: _Op_name[568:580],
+	229: _Op_name[580:592],
+	230: _Op_name[592:604],
+	231: _Op_name[604:616],
+	232: _Op_name[616:629],
+	233: _Op_name[629:642],
+	234: _Op_name[642:655],
+	235: _Op_name[655:668],
+	236: _Op_name[668:681],
+	237: _Op_name[681:694],
+	238: _Op_name[694:707],
+	239: _Op_name[707:720],
+	240: _Op_name[720:734],
+	241: _Op_name[734:748],
+	242: _Op_name[748:762],
+	243: _Op_name[762:776],
+	244: _Op_name[776:790],
+	245: _Op_name[790:804],
+	246: _Op_name[804:818],
+	247: _Op_name[818:832],
+	248: _Op_name[832:846],
+	249: _Op_name[846:860],
+	250: _Op_name[860:874],
+	251: _Op_name[874:888],
+	252: _Op_name[888:902],
+	253: _Op_name[902:916],
+	254: _Op_name[916:930],
+	255: _Op_name[930:944],
 }
 
 func (i Op) String() string {
