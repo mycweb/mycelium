@@ -4,7 +4,6 @@ package mycexpr
 
 import (
 	"fmt"
-	"math/bits"
 	"strings"
 
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -536,16 +535,32 @@ func literalKind(k *myc.Kind) *Expr {
 }
 
 func literalBits(x myc.AsBitArray) *Expr {
-	l := x.AsBitArray().Len()
+	ba := x.AsBitArray()
+	l := ba.Len()
 	switch l {
 	case 0:
 		return &Expr{
 			op:      spec.LiteralB0,
 			literal: x,
 		}
-	case 2, 4, 8, 16, 32, 64, 128, 256:
+	case 1:
 		return &Expr{
-			op:      spec.LiteralB2 + spec.Op(bits.TrailingZeros(uint(l))-1),
+			op:      spec.LiteralB1(int(ba.At(0))),
+			literal: x,
+		}
+	case 2:
+		return &Expr{
+			op:      spec.LiteralB2(int(ba.At(1))<<1 | int(ba.At(0))<<0),
+			literal: x,
+		}
+	case 3:
+		return &Expr{
+			op:      spec.LiteralB3(int(ba.At(2))<<2 | int(ba.At(1))<<1 | int(ba.At(0)<<0)),
+			literal: x,
+		}
+	case 8, 16, 32, 64, 128, 256:
+		return &Expr{
+			op:      spec.LiteralBytes(l),
 			literal: x,
 		}
 	default:
