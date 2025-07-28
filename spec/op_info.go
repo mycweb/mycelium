@@ -74,7 +74,6 @@ var infos = func() (ret [1 << 16]Info) {
 		AnyTypeTo:    {1},
 
 		// Accessors
-		Len:     {1},
 		Field:   {2},
 		Slot:    {2},
 		Section: {3},

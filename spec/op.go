@@ -89,9 +89,6 @@ const (
 	// MakeSum (x SumType, tag BitArray, v AnyValue) =>
 	MakeSum
 
-	// Len returns the length of a value.
-	// All calls to Get must have an index < the value returned by Len.
-	Len
 	// Which returns the Sum field which can be read from.
 	// Only one field of a Sum is valid to read at a time.
 	Which

@@ -344,8 +344,12 @@ func (eb EB) Product(xs ...*Expr) *Expr {
 	}
 }
 
-func (EB) Len(x *Expr) *Expr {
-	return newExpr(spec.Len, x)
+func (eb EB) ArrayLen(x *Expr) *Expr {
+	return eb.Section(eb.Encode(eb.TypeOf(x)), spec.AnyTypeBits, spec.AnyTypeBits+spec.SizeBits)
+}
+
+func (eb EB) ListLen(x *Expr) *Expr {
+	return eb.Section(eb.Encode(x), spec.RefBits, spec.RefBits+spec.SizeBits)
 }
 
 func (eb EB) Field(x *Expr, i int) *Expr {

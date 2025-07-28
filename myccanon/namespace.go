@@ -115,7 +115,7 @@ var (
 	})
 	// NS_Len returns the number of entries in a Namespace
 	NS_Len = lambda(NS_Type, myc.SizeType(), func(eb EB) *Expr {
-		return eb.Len(eb.P(0))
+		return eb.ListLen(eb.P(0))
 	})
 	// NS_Find returns the number of entries
 	NS_Find = lambda(ProductType{NS_Type, myc.StringType()}, myc.SizeType(), func(eb EB) *Expr {

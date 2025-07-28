@@ -679,10 +679,10 @@ func (c *Compiler) compileSimple(ctx context.Context, mc machCtx, code spec.Op, 
 				},
 			},
 		}, nil
-	case spec.Len:
-		return c.compileLen(ctx, argTypes[0])
 	case spec.Slot:
 		return c.compileSlot(ctx, argTypes[0], argTypes[1])
+	case spec.Section:
+		return c.compileSection(ctx, argTypes, argValues)
 
 	// Store
 	case spec.Load:
@@ -1219,6 +1219,46 @@ func (c *Compiler) compileField(ctx context.Context, mc machCtx, xE, idxE myc.Pr
 	}
 }
 
+func (c *Compiler) compileSection(ctx context.Context, argTypes [4]Type, argValues [4][]Word) (*Prog, error) {
+	st, err := c.sizeType(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.checkSupersets(ctx, &st, &argTypes[1]); err != nil {
+		return nil, fmt.Errorf("section: beg must be type: %w", err)
+	}
+	if err := c.checkSupersets(ctx, &st, &argTypes[2]); err != nil {
+		return nil, fmt.Errorf("section: end must be a Size: %w", err)
+	}
+	if argTypes[0].Type2.TypeCode() != spec.TC_Array {
+		return nil, fmt.Errorf("section: arg[0] must be an array")
+	}
+	elemTy, err := c.getTypeParam(ctx, &argTypes[0], 0)
+	if err != nil {
+		return nil, err
+	}
+	if argValues[1] == nil || argValues[2] == nil {
+		return nil, fmt.Errorf("section: beg and end must be known at compile time")
+	}
+	beg, end := int(argValues[1][0]), int(argValues[2][0])
+	outTy, err := c.arrayType(ctx, elemTy, end-beg)
+	if err != nil {
+		return nil, err
+	}
+	return &Prog{
+		Type: outTy,
+		I: []I{
+			// TODO: since beg and end are known at comile time, we should avoid putting them on the stack at runtime.
+			discardI{words: 2},
+			sliceI{
+				inputBits: argTypes[0].Size,
+				beg:       beg,
+				end:       end,
+			},
+		},
+	}, nil
+}
+
 func (c *Compiler) compileSlot(ctx context.Context, x Type, idx Type) (*Prog, error) {
 	st, err := c.sizeType(ctx)
 	if err != nil {
@@ -1257,43 +1297,6 @@ func (c *Compiler) compileSlot(ctx context.Context, x Type, idx Type) (*Prog, er
 	default:
 		return nil, fmt.Errorf("slot on %v", x)
 	}
-}
-
-func (c *Compiler) compileLen(ctx context.Context, x Type) (*Prog, error) {
-	sizeType, err := c.sizeType(ctx)
-	if err != nil {
-		return nil, err
-	}
-	var l int
-	switch x.Type2.TypeCode() {
-	case spec.TC_Array:
-		at := ArrayType(x.Data)
-		l = at.Len()
-	case spec.TC_Sum:
-		st := SumType(x.Data)
-		l = st.Len()
-	case spec.TC_Product:
-		pt := ProductType(x.Data)
-		l = pt.Len()
-	case spec.TC_List:
-		return &Prog{
-			Type: sizeType,
-			I: []I{sliceI{
-				inputBits: ListBits,
-				beg:       RefBits,
-				end:       ListBits,
-			}},
-		}, nil
-	default:
-		return nil, fmt.Errorf("len on %v", x)
-	}
-	return &Prog{
-		Type: sizeType,
-		I: []I{
-			discardI{words: x.SizeWords()},
-			pushI{x: uint32(l)},
-		},
-	}, nil
 }
 
 func (c *Compiler) saltFor(ctx context.Context, x Type) (*Ref, error) {

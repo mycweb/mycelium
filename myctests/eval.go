@@ -320,6 +320,16 @@ func lenEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 		{0, myc.NewArray(myc.BitType{})},
 		{1, myc.NewArray(myc.BitType{}, bit(0))},
 		{2, myc.NewArray(myc.BitType{}, bit(0), bit(1))},
+	}
+	for _, vec := range vecs {
+		out = append(out, EvalVec{
+			I: EB{}.ArrayLen(lit(vec.Value)),
+			O: b32(vec.Len),
+		})
+	}
+
+	// lists
+	vecs = []vec{
 		{0, myc.NewString("")},
 		{1, myc.NewString("a")},
 		{2, myc.NewString("ab")},
@@ -327,7 +337,7 @@ func lenEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}
 	for _, vec := range vecs {
 		out = append(out, EvalVec{
-			I: EB{}.Len(lit(vec.Value)),
+			I: EB{}.ListLen(lit(vec.Value)),
 			O: b32(vec.Len),
 		})
 	}
