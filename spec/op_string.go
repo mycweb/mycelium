@@ -33,6 +33,8 @@ func _() {
 	_ = x[Field-40]
 	_ = x[Slot-41]
 	_ = x[Section-42]
+	_ = x[Gather-43]
+	_ = x[Slice-44]
 	_ = x[Let-48]
 	_ = x[Lazy-49]
 	_ = x[Lambda-50]
@@ -43,23 +45,19 @@ func _() {
 	_ = x[Branch-55]
 	_ = x[Try-56]
 	_ = x[Panic-57]
-	_ = x[Map-64]
-	_ = x[Reduce-65]
-	_ = x[Post-80]
-	_ = x[Load-81]
-	_ = x[Input-96]
-	_ = x[Output-97]
-	_ = x[Interact-98]
-	_ = x[Gather-112]
-	_ = x[Slice-113]
-	_ = x[ListFrom-114]
-	_ = x[ListTo-115]
-	_ = x[AnyTypeFrom-116]
-	_ = x[AnyTypeTo-117]
-	_ = x[AnyTypeElemType-118]
-	_ = x[AnyValueFrom-119]
-	_ = x[AnyValueTo-120]
-	_ = x[AnyValueElemType-121]
+	_ = x[Post-64]
+	_ = x[Load-65]
+	_ = x[Input-80]
+	_ = x[Output-81]
+	_ = x[Interact-82]
+	_ = x[ListFrom-112]
+	_ = x[ListTo-113]
+	_ = x[AnyTypeFrom-114]
+	_ = x[AnyTypeTo-115]
+	_ = x[AnyTypeElemType-116]
+	_ = x[AnyValueFrom-117]
+	_ = x[AnyValueTo-118]
+	_ = x[AnyValueElemType-119]
 	_ = x[Self-128]
 	_ = x[LiteralKind-129]
 	_ = x[LiteralAnyType-130]
@@ -77,7 +75,7 @@ func _() {
 	_ = x[ParamN-255]
 }
 
-const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumLenWhichFieldSlotSectionLetLazyLambdaFractalEvalApplyMuxBranchTryPanicMapReducePostLoadInputOutputInteractGatherSliceListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
+const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumLenWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
 
 var _Op_map = map[Op]string{
 	0:   _Op_name[0:7],
@@ -105,48 +103,46 @@ var _Op_map = map[Op]string{
 	40:  _Op_name[144:149],
 	41:  _Op_name[149:153],
 	42:  _Op_name[153:160],
-	48:  _Op_name[160:163],
-	49:  _Op_name[163:167],
-	50:  _Op_name[167:173],
-	51:  _Op_name[173:180],
-	52:  _Op_name[180:184],
-	53:  _Op_name[184:189],
-	54:  _Op_name[189:192],
-	55:  _Op_name[192:198],
-	56:  _Op_name[198:201],
-	57:  _Op_name[201:206],
-	64:  _Op_name[206:209],
-	65:  _Op_name[209:215],
-	80:  _Op_name[215:219],
-	81:  _Op_name[219:223],
-	96:  _Op_name[223:228],
-	97:  _Op_name[228:234],
-	98:  _Op_name[234:242],
-	112: _Op_name[242:248],
-	113: _Op_name[248:253],
-	114: _Op_name[253:261],
-	115: _Op_name[261:267],
-	116: _Op_name[267:278],
-	117: _Op_name[278:287],
-	118: _Op_name[287:302],
-	119: _Op_name[302:314],
-	120: _Op_name[314:324],
-	121: _Op_name[324:340],
-	128: _Op_name[340:344],
-	129: _Op_name[344:355],
-	130: _Op_name[355:369],
-	131: _Op_name[369:384],
-	136: _Op_name[384:393],
-	137: _Op_name[393:402],
-	138: _Op_name[402:411],
-	139: _Op_name[411:420],
-	140: _Op_name[420:430],
-	141: _Op_name[430:440],
-	142: _Op_name[440:450],
-	143: _Op_name[450:461],
-	144: _Op_name[461:472],
-	192: _Op_name[472:478],
-	255: _Op_name[478:484],
+	43:  _Op_name[160:166],
+	44:  _Op_name[166:171],
+	48:  _Op_name[171:174],
+	49:  _Op_name[174:178],
+	50:  _Op_name[178:184],
+	51:  _Op_name[184:191],
+	52:  _Op_name[191:195],
+	53:  _Op_name[195:200],
+	54:  _Op_name[200:203],
+	55:  _Op_name[203:209],
+	56:  _Op_name[209:212],
+	57:  _Op_name[212:217],
+	64:  _Op_name[217:221],
+	65:  _Op_name[221:225],
+	80:  _Op_name[225:230],
+	81:  _Op_name[230:236],
+	82:  _Op_name[236:244],
+	112: _Op_name[244:252],
+	113: _Op_name[252:258],
+	114: _Op_name[258:269],
+	115: _Op_name[269:278],
+	116: _Op_name[278:293],
+	117: _Op_name[293:305],
+	118: _Op_name[305:315],
+	119: _Op_name[315:331],
+	128: _Op_name[331:335],
+	129: _Op_name[335:346],
+	130: _Op_name[346:360],
+	131: _Op_name[360:375],
+	136: _Op_name[375:384],
+	137: _Op_name[384:393],
+	138: _Op_name[393:402],
+	139: _Op_name[402:411],
+	140: _Op_name[411:421],
+	141: _Op_name[421:431],
+	142: _Op_name[431:441],
+	143: _Op_name[441:452],
+	144: _Op_name[452:463],
+	192: _Op_name[463:469],
+	255: _Op_name[469:475],
 }
 
 func (i Op) String() string {

@@ -12,9 +12,9 @@ type Op uint8
 const (
 	Unknown Op = iota
 
-	// Pass (val: AnyVaue) => val
+	// Pass (val: T) => val
 	Pass
-	// Equal: (a: Any, b: Any) -> Bit
+	// Equal: (a: T, b: T) -> Bit
 	Equal
 
 	// Craft creates new values of a specified type
@@ -103,6 +103,14 @@ const (
 	// Section (x: Array[T, l], beg: Size, end: Size) -> Array[T, end - beg]
 	// beg and end must be known at compile time
 	Section
+
+	// Gather: (x Array[List[T], _]) -> List[T]
+	Gather
+	// Slice (x List[T], beg: Size, end: Size) -> List[T]
+	// Slice returns a List containing the elements in x from beg (inclusive) to end (exclusive)
+	// If beg or end are out of bounds, Slice will panic.
+	// If end is < beg, slice will panic.
+	Slice
 )
 
 const (
@@ -132,22 +140,15 @@ const (
 )
 
 const (
-	// Map: (elemIn: Type, x Array[ty, _], fn (elemIn) -> elemOut) Array[elemOut, _]
-	Map Op = 4*section + iota
-	// Reduce: (elem: Type, x Array[elem, _], fn (left, right elem) -> elem ) elem
-	Reduce
-)
-
-const (
 	// Post: (a Value) => Ref[ty]
-	Post Op = 5*section + iota
+	Post Op = 4*section + iota
 	// Load: (x Ref[T]) => T
 	Load
 )
 
 const (
 	// Input: (p: Port[_, T, _, _]) -> T
-	Input Op = 6*section + iota
+	Input Op = 5*section + iota
 	// Output: (p: Port[T, _, _, _], x: T) -> ()
 	Output
 	// Interact: (p: Port[_, _, Req, Resp], req: Req) -> Resp
@@ -155,17 +156,9 @@ const (
 )
 
 const (
-	// Gather: (x Array[List[T], _]) -> List[T]
-	Gather Op = 7*section + iota
-	// Slice (x List[T], beg: Size, end: Size) -> List[T]
-	// Slice returns a List containing the elements in x from beg (inclusive) to end (exclusive)
-	// If beg or end are out of bounds, Slice will panic.
-	// If end is < beg, slice will panic.
-	Slice
-
 	// ListFrom
 	// DEPRECATED
-	ListFrom
+	ListFrom Op = 7*section + iota
 	// ListTo
 	// DEPRECATED
 	ListTo

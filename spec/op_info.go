@@ -64,6 +64,7 @@ var infos = func() (ret [1 << 16]Info) {
 		Interact: {2},
 
 		Gather:   {1},
+		Slice:    {3},
 		ListFrom: {1},
 		ListTo:   {2},
 
@@ -78,10 +79,6 @@ var infos = func() (ret [1 << 16]Info) {
 		Slot:    {2},
 		Section: {3},
 		Which:   {1},
-
-		// Array Compute
-		Map:    {2},
-		Reduce: {2},
 	}
 	for i := range ret {
 		ret[i] = Info{-1}

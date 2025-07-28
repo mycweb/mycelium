@@ -123,36 +123,6 @@ func nsEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func mapReduce(out []EvalVec, s cadata.PostExister) []EvalVec {
-	eb := EB{}
-	return append(out, []EvalVec{
-		{
-			Name: "ArrayMap",
-			I: mkExpr(spec.Map,
-				lit(myc.NewArray(B8Type, b8(1), b8(2), b8(3), b8(4))),
-				eb.Lambda(
-					B8Type,
-					B8Type,
-					func(eb EB) *Expr { return modAdd(eb, eb.P(0), eb.P(0)) },
-				),
-			),
-			O: myc.NewArray(B8Type, b8(2), b8(4), b8(6), b8(8)),
-		},
-		{
-			Name: "ArrayReduce",
-			I: mkExpr(spec.Reduce,
-				lit(myc.NewArray(B8Type, b8(1), b8(2), b8(3), b8(4))),
-				eb.Lambda(
-					ProductType{B8Type, B8Type},
-					myc.B8Type(),
-					func(eb EB) *Expr { return modAdd(eb, eb.Arg(0, 0), eb.Arg(0, 1)) },
-				),
-			),
-			O: b8(10),
-		},
-	}...)
-}
-
 func modAdd(eb EB, a, b *Expr) *Expr {
 	return eb.Apply(eb.Lit(myccanon.B32_Add), eb.Product(a, b))
 }

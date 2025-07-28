@@ -388,11 +388,3 @@ func (EB) Post(x *Expr) *Expr {
 func (EB) Load(x *Expr) *Expr {
 	return newExpr(spec.Load, x)
 }
-
-func (EB) Map(x *Expr, fn *Expr) *Expr {
-	return newExpr(spec.Map, x, fn)
-}
-
-func (EB) Reduce(x, fn *Expr) *Expr {
-	return newExpr(spec.Reduce, x, fn)
-}

@@ -40,10 +40,10 @@ var (
 var (
 	B32 = myc.B32Type()
 
-	B32_NOT = lambda(B32, B32, func(eb mycexpr.EB) *Expr { return eb.Map(eb.P(0), eb.Lit(NOT)) })
-	B32_AND = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
-	B32_OR  = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
-	B32_XOR = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
+	B32_NOT = lambda(B32, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.P(0), eb.Lit(NOT)) })
+	B32_AND = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayZip(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
+	B32_OR  = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayZip(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
+	B32_XOR = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayZip(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
 
 	B32_Neg = lambda(B32, B32, func(eb mycexpr.EB) *Expr { return negNBit(32, eb.P(0)) })
 
@@ -53,22 +53,20 @@ var (
 	B32_Div = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return divNBit(32, eb.Arg(0, 0), eb.Arg(0, 1)) })
 
 	B32_POPCOUNT = lambda(B32, B32, func(eb mycexpr.EB) *Expr {
-		return eb.Reduce(
-			eb.Map(eb.P(0), eb.Lambda(myc.BitType{}, B32, func(eb mycexpr.EB) *Expr {
-				return eb.Concat(eb.ArrayUnit(eb.P(0)), mkZeros(31))
-			})),
-			eb.Lit(B32_Add),
-		)
+		m := arrayMap(32, eb.P(0), eb.Lambda(myc.BitType{}, B32, func(eb mycexpr.EB) *Expr {
+			return eb.Concat(eb.ArrayUnit(eb.P(0)), mkZeros(31))
+		}))
+		return reduceArray(0, 32, m, eb.Lit(B32_Add))
 	})
 )
 
 var (
 	B64 = myc.B64Type()
 
-	B64_NOT = lambda(B64, B64, func(eb mycexpr.EB) *Expr { return eb.Map(eb.P(0), eb.Lit(NOT)) })
-	B64_AND = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayMap(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
-	B64_OR  = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayMap(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
-	B64_XOR = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayMap(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
+	B64_NOT = lambda(B64, B64, func(eb mycexpr.EB) *Expr { return arrayMap(64, eb.P(0), eb.Lit(NOT)) })
+	B64_AND = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayZip(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
+	B64_OR  = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayZip(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
+	B64_XOR = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayZip(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
 
 	B64_Neg = lambda(B64, B64, func(eb mycexpr.EB) *Expr { return negNBit(64, eb.P(0)) })
 
@@ -78,28 +76,73 @@ var (
 	B64_Div = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return divNBit(64, eb.Arg(0, 0), eb.Arg(0, 1)) })
 
 	B64_POPCOUNT = lambda(B64, B64, func(eb mycexpr.EB) *Expr {
-		return eb.Reduce(
-			eb.Map(eb.P(0), eb.Lambda(myc.BitType{}, B64, func(eb mycexpr.EB) *Expr {
-				return eb.Concat(eb.ArrayUnit(eb.P(0)), mkZeros(63))
-			})),
-			eb.Lit(B64_Add),
-		)
+		m := arrayMap(64, eb.P(0), eb.Lambda(myc.BitType{}, B64, func(eb mycexpr.EB) *Expr {
+			return eb.Concat(eb.ArrayUnit(eb.P(0)), mkZeros(63))
+		}))
+		return reduceArray(0, 64, m, eb.Lit(B64_Add))
 	})
 )
 
-func bitArrayMap(n int, a, b, fn *Expr) *Expr {
+func bitArrayZip(n int, a, b, fn *Expr) *Expr {
 	out := make([]*Expr, n)
 	for i := range n {
-		x := eb.Product(eb.Slot(a, eb.B32(uint32(i))), eb.Slot(b, eb.B32(uint32(i))))
+		x := eb.Product(
+			eb.Slot(a, eb.B32(uint32(i))),
+			eb.Slot(b, eb.B32(uint32(i))),
+		)
 		out[i] = eb.Apply(fn, x)
 	}
 	return eb.Array(eb.BitType(), out...)
 }
 
+func bitArrayMap(n int, x, fn *Expr) *Expr {
+	out := make([]*Expr, n)
+	for i := range n {
+		out[i] = eb.Apply(fn, eb.Slot(x, eb.B32(uint32(i))))
+	}
+	return eb.Array(eb.BitType(), out...)
+}
+
+// arrayMap generically maps an array, it does not work on empty arrays
+func arrayMap(n int, xs *Expr, fn *Expr) *Expr {
+	out := make([]*Expr, n)
+	for i := range n {
+		out[i] = eb.Apply(fn, eb.Slot(xs, eb.B32(uint32(i))))
+	}
+	return mkArray(out...)
+}
+
+func mkArray(xs ...*Expr) *Expr {
+	switch len(xs) {
+	case 0:
+		panic("mkArray on 0 elements")
+	case 1:
+		return eb.ArrayUnit(xs[0])
+	default:
+		left := mkArray(xs[:len(xs)/2]...)
+		right := mkArray(xs[len(xs)/2:]...)
+		return eb.Concat(left, right)
+	}
+}
+
+func reduceArray(beg, end int, arr, fn *Expr) *Expr {
+	switch end - beg {
+	case 0:
+		panic("reduceArray on 0 length array")
+	case 1:
+		return eb.Slot(arr, eb.B32(uint32(beg)))
+	default:
+		mid := (end-beg)/2 + beg
+		left := reduceArray(beg, mid, arr, fn)
+		right := reduceArray(mid, end, arr, fn)
+		return eb.Apply(fn, eb.Product(left, right))
+	}
+}
+
 func negNBit(n int, x *Expr) *Expr {
 	// ~x + 1
 	return addNBit(n,
-		eb.Map(x, eb.Lit(NOT)),
+		arrayMap(n, x, eb.Lit(NOT)),
 		eb.Concat(eb.Bit(1), mkZeros(n-1)),
 	)
 }
