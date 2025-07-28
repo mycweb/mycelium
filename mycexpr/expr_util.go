@@ -396,7 +396,3 @@ func (EB) Map(x *Expr, fn *Expr) *Expr {
 func (EB) Reduce(x, fn *Expr) *Expr {
 	return newExpr(spec.Reduce, x, fn)
 }
-
-func (EB) Zip(left, right *Expr) *Expr {
-	return newExpr(spec.Zip, left, right)
-}

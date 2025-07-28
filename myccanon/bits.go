@@ -41,9 +41,9 @@ var (
 	B32 = myc.B32Type()
 
 	B32_NOT = lambda(B32, B32, func(eb mycexpr.EB) *Expr { return eb.Map(eb.P(0), eb.Lit(NOT)) })
-	B32_AND = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return elementWise(eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
-	B32_OR  = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return elementWise(eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
-	B32_XOR = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return elementWise(eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
+	B32_AND = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
+	B32_OR  = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
+	B32_XOR = lambda(myc.ProductType{B32, B32}, B32, func(eb mycexpr.EB) *Expr { return bitArrayMap(32, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
 
 	B32_Neg = lambda(B32, B32, func(eb mycexpr.EB) *Expr { return negNBit(32, eb.P(0)) })
 
@@ -66,9 +66,9 @@ var (
 	B64 = myc.B64Type()
 
 	B64_NOT = lambda(B64, B64, func(eb mycexpr.EB) *Expr { return eb.Map(eb.P(0), eb.Lit(NOT)) })
-	B64_AND = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return elementWise(eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
-	B64_OR  = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return elementWise(eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
-	B64_XOR = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return elementWise(eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
+	B64_AND = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayMap(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(AND)) })
+	B64_OR  = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayMap(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(OR)) })
+	B64_XOR = lambda(myc.ProductType{B64, B64}, B64, func(eb mycexpr.EB) *Expr { return bitArrayMap(64, eb.Arg(0, 0), eb.Arg(0, 1), eb.Lit(XOR)) })
 
 	B64_Neg = lambda(B64, B64, func(eb mycexpr.EB) *Expr { return negNBit(64, eb.P(0)) })
 
@@ -87,8 +87,13 @@ var (
 	})
 )
 
-func elementWise(a, b, fn *Expr) *Expr {
-	return eb.Map(eb.Zip(a, b), fn)
+func bitArrayMap(n int, a, b, fn *Expr) *Expr {
+	out := make([]*Expr, n)
+	for i := range n {
+		x := eb.Product(eb.Slot(a, eb.B32(uint32(i))), eb.Slot(b, eb.B32(uint32(i))))
+		out[i] = eb.Apply(fn, x)
+	}
+	return eb.Array(eb.BitType(), out...)
 }
 
 func negNBit(n int, x *Expr) *Expr {

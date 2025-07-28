@@ -45,6 +45,7 @@ var infos = func() (ret [1 << 16]Info) {
 		ProductEmpty: {0},
 		ProductUnit:  {1},
 		MakeSum:      {3},
+		Concat:       {2},
 
 		// Compute
 		Lazy:    {1},
@@ -81,9 +82,6 @@ var infos = func() (ret [1 << 16]Info) {
 		// Array Compute
 		Map:    {2},
 		Reduce: {2},
-		Zip:    {2},
-		Fold:   {3},
-		Concat: {2},
 	}
 	for i := range ret {
 		ret[i] = Info{-1}

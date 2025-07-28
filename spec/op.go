@@ -136,11 +136,6 @@ const (
 	Map Op = 4*section + iota
 	// Reduce: (elem: Type, x Array[elem, _], fn (left, right elem) -> elem ) elem
 	Reduce
-	// Zip: (left Array[Left, l], right Array[Right, l]) Array[Product[Left, Right], l]
-	// DEPRECATED
-	Zip
-	// Fold: (x Array[T], init Acc, fn *Lambda[Product[Acc, T], Acc]) Acc
-	Fold
 )
 
 const (
