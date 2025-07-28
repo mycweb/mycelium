@@ -446,7 +446,7 @@ func codecEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 			O:    mycmem.NewBitArray(0, 1, 0, 1),
 		},
 		{
-			Name: "Decode4Bit",
+			Name: "Decode3Bit",
 			I:    eb.Decode(eb.ProductType(eb.BitType(), eb.BitType(), eb.BitType()), eb.Lit(mycmem.NewBitArray(1, 0, 1))),
 			O:    mycmem.Product{bit(1), bit(0), bit(1)},
 		},
