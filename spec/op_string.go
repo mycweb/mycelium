@@ -20,61 +20,95 @@ func _() {
 	_ = x[Root-9]
 	_ = x[Encode-10]
 	_ = x[Decode-11]
-	_ = x[ZERO-16]
-	_ = x[ONE-31]
-	_ = x[ArrayEmpty-32]
-	_ = x[ArrayUnit-33]
-	_ = x[ProductEmpty-34]
-	_ = x[ProductUnit-35]
-	_ = x[Concat-36]
-	_ = x[MakeSum-37]
-	_ = x[Which-38]
-	_ = x[Field-39]
-	_ = x[Slot-40]
-	_ = x[Section-41]
-	_ = x[Gather-42]
-	_ = x[Slice-43]
-	_ = x[Let-48]
-	_ = x[Lazy-49]
-	_ = x[Lambda-50]
-	_ = x[Fractal-51]
-	_ = x[Eval-52]
-	_ = x[Apply-53]
-	_ = x[Mux-54]
-	_ = x[Branch-55]
-	_ = x[Try-56]
-	_ = x[Panic-57]
-	_ = x[Post-64]
-	_ = x[Load-65]
-	_ = x[Input-80]
-	_ = x[Output-81]
-	_ = x[Interact-82]
-	_ = x[ListFrom-112]
-	_ = x[ListTo-113]
-	_ = x[AnyTypeFrom-114]
-	_ = x[AnyTypeTo-115]
-	_ = x[AnyTypeElemType-116]
-	_ = x[AnyValueFrom-117]
-	_ = x[AnyValueTo-118]
-	_ = x[AnyValueElemType-119]
-	_ = x[Self-128]
-	_ = x[LiteralKind-129]
-	_ = x[LiteralAnyType-130]
-	_ = x[LiteralAnyValue-131]
-	_ = x[LiteralB0-136]
-	_ = x[LiteralB2-137]
-	_ = x[LiteralB4-138]
-	_ = x[LiteralB8-139]
-	_ = x[LiteralB16-140]
-	_ = x[LiteralB32-141]
-	_ = x[LiteralB64-142]
-	_ = x[LiteralB128-143]
-	_ = x[LiteralB256-144]
-	_ = x[Param0-192]
-	_ = x[ParamN-255]
+	_ = x[ArrayEmpty-16]
+	_ = x[ArrayUnit-17]
+	_ = x[ProductEmpty-18]
+	_ = x[ProductUnit-19]
+	_ = x[Concat-20]
+	_ = x[MakeSum-21]
+	_ = x[Which-22]
+	_ = x[Field-23]
+	_ = x[Slot-24]
+	_ = x[Section-25]
+	_ = x[Gather-26]
+	_ = x[Slice-27]
+	_ = x[Let-32]
+	_ = x[Lazy-33]
+	_ = x[Lambda-34]
+	_ = x[Fractal-35]
+	_ = x[Eval-36]
+	_ = x[Apply-37]
+	_ = x[Mux-38]
+	_ = x[Branch-39]
+	_ = x[Try-40]
+	_ = x[Panic-41]
+	_ = x[Self-42]
+	_ = x[Post-48]
+	_ = x[Load-49]
+	_ = x[Input-64]
+	_ = x[Output-65]
+	_ = x[Interact-66]
+	_ = x[ListFrom-80]
+	_ = x[ListTo-81]
+	_ = x[AnyTypeFrom-82]
+	_ = x[AnyTypeTo-83]
+	_ = x[AnyTypeElemType-84]
+	_ = x[AnyValueFrom-85]
+	_ = x[AnyValueTo-86]
+	_ = x[AnyValueElemType-87]
+	_ = x[Param0-112]
+	_ = x[ParamN-127]
+	_ = x[ZERO-128]
+	_ = x[ONE-129]
+	_ = x[LiteralKind-130]
+	_ = x[LiteralArrayType-131]
+	_ = x[LiteralRefType-132]
+	_ = x[LiteralListType-133]
+	_ = x[LiteralLazyType-134]
+	_ = x[LiteralLambdaType-135]
+	_ = x[LiteralPortType-136]
+	_ = x[LiteralAnyType-137]
+	_ = x[LiteralAnyValue-138]
+	_ = x[LiteralB8-192]
+	_ = x[LiteralB16-193]
+	_ = x[LiteralB32-195]
+	_ = x[LiteralB64-199]
+	_ = x[Literal128-207]
+	_ = x[LiteralB256-223]
+	_ = x[LiteralB0-224]
+	_ = x[LiteralB1_0-226]
+	_ = x[LiteralB1_1-227]
+	_ = x[LiteralB2_00-228]
+	_ = x[LiteralB2_01-229]
+	_ = x[LiteralB2_10-230]
+	_ = x[LiteralB2_11-231]
+	_ = x[LiteralB3_000-232]
+	_ = x[LiteralB3_001-233]
+	_ = x[LiteralB3_010-234]
+	_ = x[LiteralB3_011-235]
+	_ = x[LiteralB3_100-236]
+	_ = x[LiteralB3_101-237]
+	_ = x[LiteralB3_110-238]
+	_ = x[LiteralB3_111-239]
+	_ = x[LiteralB4_0000-240]
+	_ = x[LiteralB4_0001-241]
+	_ = x[LiteralB4_0010-242]
+	_ = x[LiteralB4_0011-243]
+	_ = x[LiteralB4_0100-244]
+	_ = x[LiteralB4_0101-245]
+	_ = x[LiteralB4_0110-246]
+	_ = x[LiteralB4_0111-247]
+	_ = x[LiteralB4_1000-248]
+	_ = x[LiteralB4_1001-249]
+	_ = x[LiteralB4_1010-250]
+	_ = x[LiteralB4_1011-251]
+	_ = x[LiteralB4_1100-252]
+	_ = x[LiteralB4_1101-253]
+	_ = x[LiteralB4_1110-254]
+	_ = x[LiteralB4_1111-255]
 }
 
-const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
+const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicSelfPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeParam0ParamNZEROONELiteralKindLiteralArrayTypeLiteralRefTypeLiteralListTypeLiteralLazyTypeLiteralLambdaTypeLiteralPortTypeLiteralAnyTypeLiteralAnyValueLiteralB8LiteralB16LiteralB32LiteralB64Literal128LiteralB256LiteralB0LiteralB1_0LiteralB1_1LiteralB2_00LiteralB2_01LiteralB2_10LiteralB2_11LiteralB3_000LiteralB3_001LiteralB3_010LiteralB3_011LiteralB3_100LiteralB3_101LiteralB3_110LiteralB3_111LiteralB4_0000LiteralB4_0001LiteralB4_0010LiteralB4_0011LiteralB4_0100LiteralB4_0101LiteralB4_0110LiteralB4_0111LiteralB4_1000LiteralB4_1001LiteralB4_1010LiteralB4_1011LiteralB4_1100LiteralB4_1101LiteralB4_1110LiteralB4_1111"
 
 var _Op_map = map[Op]string{
 	0:   _Op_name[0:7],
@@ -89,58 +123,92 @@ var _Op_map = map[Op]string{
 	9:   _Op_name[58:62],
 	10:  _Op_name[62:68],
 	11:  _Op_name[68:74],
-	16:  _Op_name[74:78],
-	31:  _Op_name[78:81],
-	32:  _Op_name[81:91],
-	33:  _Op_name[91:100],
-	34:  _Op_name[100:112],
-	35:  _Op_name[112:123],
-	36:  _Op_name[123:129],
-	37:  _Op_name[129:136],
-	38:  _Op_name[136:141],
-	39:  _Op_name[141:146],
-	40:  _Op_name[146:150],
-	41:  _Op_name[150:157],
-	42:  _Op_name[157:163],
-	43:  _Op_name[163:168],
-	48:  _Op_name[168:171],
-	49:  _Op_name[171:175],
-	50:  _Op_name[175:181],
-	51:  _Op_name[181:188],
-	52:  _Op_name[188:192],
-	53:  _Op_name[192:197],
-	54:  _Op_name[197:200],
-	55:  _Op_name[200:206],
-	56:  _Op_name[206:209],
-	57:  _Op_name[209:214],
-	64:  _Op_name[214:218],
-	65:  _Op_name[218:222],
-	80:  _Op_name[222:227],
-	81:  _Op_name[227:233],
-	82:  _Op_name[233:241],
-	112: _Op_name[241:249],
-	113: _Op_name[249:255],
-	114: _Op_name[255:266],
-	115: _Op_name[266:275],
-	116: _Op_name[275:290],
-	117: _Op_name[290:302],
-	118: _Op_name[302:312],
-	119: _Op_name[312:328],
-	128: _Op_name[328:332],
-	129: _Op_name[332:343],
-	130: _Op_name[343:357],
-	131: _Op_name[357:372],
-	136: _Op_name[372:381],
-	137: _Op_name[381:390],
-	138: _Op_name[390:399],
-	139: _Op_name[399:408],
-	140: _Op_name[408:418],
-	141: _Op_name[418:428],
-	142: _Op_name[428:438],
-	143: _Op_name[438:449],
-	144: _Op_name[449:460],
-	192: _Op_name[460:466],
-	255: _Op_name[466:472],
+	16:  _Op_name[74:84],
+	17:  _Op_name[84:93],
+	18:  _Op_name[93:105],
+	19:  _Op_name[105:116],
+	20:  _Op_name[116:122],
+	21:  _Op_name[122:129],
+	22:  _Op_name[129:134],
+	23:  _Op_name[134:139],
+	24:  _Op_name[139:143],
+	25:  _Op_name[143:150],
+	26:  _Op_name[150:156],
+	27:  _Op_name[156:161],
+	32:  _Op_name[161:164],
+	33:  _Op_name[164:168],
+	34:  _Op_name[168:174],
+	35:  _Op_name[174:181],
+	36:  _Op_name[181:185],
+	37:  _Op_name[185:190],
+	38:  _Op_name[190:193],
+	39:  _Op_name[193:199],
+	40:  _Op_name[199:202],
+	41:  _Op_name[202:207],
+	42:  _Op_name[207:211],
+	48:  _Op_name[211:215],
+	49:  _Op_name[215:219],
+	64:  _Op_name[219:224],
+	65:  _Op_name[224:230],
+	66:  _Op_name[230:238],
+	80:  _Op_name[238:246],
+	81:  _Op_name[246:252],
+	82:  _Op_name[252:263],
+	83:  _Op_name[263:272],
+	84:  _Op_name[272:287],
+	85:  _Op_name[287:299],
+	86:  _Op_name[299:309],
+	87:  _Op_name[309:325],
+	112: _Op_name[325:331],
+	127: _Op_name[331:337],
+	128: _Op_name[337:341],
+	129: _Op_name[341:344],
+	130: _Op_name[344:355],
+	131: _Op_name[355:371],
+	132: _Op_name[371:385],
+	133: _Op_name[385:400],
+	134: _Op_name[400:415],
+	135: _Op_name[415:432],
+	136: _Op_name[432:447],
+	137: _Op_name[447:461],
+	138: _Op_name[461:476],
+	192: _Op_name[476:485],
+	193: _Op_name[485:495],
+	195: _Op_name[495:505],
+	199: _Op_name[505:515],
+	207: _Op_name[515:525],
+	223: _Op_name[525:536],
+	224: _Op_name[536:545],
+	226: _Op_name[545:556],
+	227: _Op_name[556:567],
+	228: _Op_name[567:579],
+	229: _Op_name[579:591],
+	230: _Op_name[591:603],
+	231: _Op_name[603:615],
+	232: _Op_name[615:628],
+	233: _Op_name[628:641],
+	234: _Op_name[641:654],
+	235: _Op_name[654:667],
+	236: _Op_name[667:680],
+	237: _Op_name[680:693],
+	238: _Op_name[693:706],
+	239: _Op_name[706:719],
+	240: _Op_name[719:733],
+	241: _Op_name[733:747],
+	242: _Op_name[747:761],
+	243: _Op_name[761:775],
+	244: _Op_name[775:789],
+	245: _Op_name[789:803],
+	246: _Op_name[803:817],
+	247: _Op_name[817:831],
+	248: _Op_name[831:845],
+	249: _Op_name[845:859],
+	250: _Op_name[859:873],
+	251: _Op_name[873:887],
+	252: _Op_name[887:901],
+	253: _Op_name[901:915],
+	254: _Op_name[915:929],
+	255: _Op_name[929:943],
 }
 
 func (i Op) String() string {
