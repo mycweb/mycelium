@@ -216,19 +216,37 @@ func encodeProg(out []byte, prog Prog) ([]byte, error) {
 			if node.IsCode(spec.ParamN) {
 				out = binary.AppendUvarint(out, uint64(node.param))
 			}
-		case node.code >= spec.LiteralB0 && node.code <= spec.LiteralB4_1111:
+		case node.code.IsSmallBitArray():
 			// no additional bytes
 		case node.IsCode(spec.LiteralB8):
+			if len(node.litBits) < 1 {
+				panic(fmt.Sprintf("encodeProg: LiteralB8 node has litBits length %d, expected at least 1", len(node.litBits)))
+			}
 			out = append(out, node.litBits[:1]...)
 		case node.IsCode(spec.LiteralB16):
+			if len(node.litBits) < 2 {
+				panic(fmt.Sprintf("encodeProg: LiteralB16 node has litBits length %d, expected at least 2", len(node.litBits)))
+			}
 			out = append(out, node.litBits[:2]...)
 		case node.IsCode(spec.LiteralB32):
+			if len(node.litBits) < 4 {
+				panic(fmt.Sprintf("encodeProg: LiteralB32 node has litBits length %d, expected at least 4. Node: %+v", len(node.litBits), node))
+			}
 			out = append(out, node.litBits[:4]...)
 		case node.IsCode(spec.LiteralB64):
+			if len(node.litBits) < 8 {
+				panic(fmt.Sprintf("encodeProg: LiteralB64 node has litBits length %d, expected at least 8", len(node.litBits)))
+			}
 			out = append(out, node.litBits[:8]...)
 		case node.IsCode(spec.LiteralB128):
+			if len(node.litBits) < 16 {
+				panic(fmt.Sprintf("encodeProg: LiteralB128 node has litBits length %d, expected at least 16", len(node.litBits)))
+			}
 			out = append(out, node.litBits[:16]...)
 		case node.IsCode(spec.LiteralB256):
+			if len(node.litBits) < 32 {
+				panic(fmt.Sprintf("encodeProg: LiteralB256 node has litBits length %d, expected at least 32", len(node.litBits)))
+			}
 			out = append(out, node.litBits[:32]...)
 		case node.IsCode(spec.LiteralKind):
 			out = MarshalAppend(out, node.litKind)
@@ -286,8 +304,13 @@ func decodeNode(dst *Node, idx uint32, src []byte, load LoadFunc) (int, error) {
 		return n, nil
 	}
 
-	if opc >= spec.LiteralB0 && opc <= spec.LiteralB4_1111 {
-		panic("not implemented")
+	if opc.IsSmallBitArray() {
+		dst.litBits = dst.litBits[:0]
+		l, d := opc.SmallBitArray()
+		if l > 0 {
+			dst.litBits = append(dst.litBits[:0], d)
+		}
+		return n, nil
 	}
 	switch opc {
 	case spec.Self:
@@ -399,11 +422,21 @@ func literalKind(k *Kind) Node {
 func literalBits(x AsBitArray) Node {
 	l := x.AsBitArray().Len()
 	switch l {
+	case 0:
+		return Node{code: spec.LiteralB0}
+	case 1:
+		return Node{code: spec.LiteralB1(int(x.AsBitArray().AsUint32()))}
+	case 2:
+		return Node{code: spec.LiteralB2(int(x.AsBitArray().AsUint32()))}
+	case 3:
+		return Node{code: spec.LiteralB3(int(x.AsBitArray().AsUint32()))}
+	case 4:
+		return Node{code: spec.LiteralB4(int(x.AsBitArray().AsUint32()))}
 	case 8, 16, 32, 64, 128, 256:
 		bb := bitbuf.New(l)
 		x.Encode(bb)
 		return Node{
-			code:    spec.LiteralBytes(l / 8),
+			code:    spec.LiteralBx8(l / 8),
 			litBits: bb.Bytes(),
 		}
 	default:
@@ -480,13 +513,18 @@ func (n Node) Param() uint32 {
 }
 
 func (node Node) Literal() Value {
-	if node.code >= spec.LiteralB0 && node.code <= spec.LiteralB4_1111 {
-		panic("not implemented")
+	if node.code.IsSmallBitArray() {
+		l, d := node.code.SmallBitArray()
+		return decodeBitArray(bitbuf.FromBytes([]byte{d}).Slice(0, l))
 	}
 	switch node.code {
 	case spec.LiteralB8, spec.LiteralB16, spec.LiteralB32, spec.LiteralB64, spec.LiteralB128, spec.LiteralB256:
-		l := 8 << (node.code - spec.LiteralB8)
-		return decodeBitArray(bitbuf.FromBytes(node.litBits).Slice(0, l))
+		// Defensive programming: check if litBits has the expected size
+		expectedBytes := node.code.DataBits() / 8
+		if len(node.litBits) < expectedBytes {
+			panic(fmt.Sprintf("Node.Literal(): opcode %v expects %d bytes but litBits has length %d. This indicates a bug in node creation.", node.code, expectedBytes, len(node.litBits)))
+		}
+		return decodeBitArray(bitbuf.FromBytes(node.litBits).Slice(0, node.code.DataBits()))
 	case spec.LiteralKind:
 		return node.litKind
 	case spec.LiteralAnyType:
@@ -494,7 +532,7 @@ func (node Node) Literal() Value {
 	case spec.LiteralAnyValue:
 		return node.litAnyValue.Unwrap()
 	default:
-		panic("not a literal")
+		panic(fmt.Sprintf("not a literal code=%v", node.code))
 	}
 }
 
@@ -509,8 +547,8 @@ func (n Node) Size() int {
 		} else {
 			return spec.OpBits
 		}
-	case n.code >= spec.LiteralB0 && n.code <= spec.LiteralB4_1111:
-		panic("not implemented")
+	case n.code.IsSmallBitArray():
+		return spec.OpBits
 	case n.code == spec.LiteralB8:
 		return spec.OpBits + 1*8
 	case n.code == spec.LiteralB16:

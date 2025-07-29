@@ -249,10 +249,49 @@ func LiteralB4(x int) Op {
 	return LiteralB4_0000 + Op(x&15)
 }
 
-// LiteralBytes returns the opcode for encoding n bytes of data as an Array of Bits
-func LiteralBytes(n int) Op {
+// LiteralBx8 returns the opcode for encoding n bytes of data as an Array of Bits
+// n is the number of bytes
+func LiteralBx8(n int) Op {
 	if n > 32 || n < 1 {
 		panic(n)
 	}
 	return LiteralB8 + Op(n) - 1
+}
+
+func (op Op) IsSmallBitArray() bool {
+	return op >= LiteralB0 && op <= LiteralB4_1111
+}
+
+// SmallBits decodes the small arrays of bits
+func (op Op) SmallBitArray() (l int, data uint8) {
+	switch {
+	case op == LiteralB0:
+		return 0, 0
+	case op >= LiteralB1_0 && op <= LiteralB1_1:
+		return 1, uint8(op - LiteralB1_0)
+	case op >= LiteralB2_00 && op <= LiteralB2_11:
+		return 2, uint8(op - LiteralB1_0)
+	case op >= LiteralB3_000 && op <= LiteralB3_111:
+		return 3, uint8(op - LiteralB1_0)
+	case op >= LiteralB4_0000 && op <= LiteralB4_1111:
+		return 4, uint8(op - LiteralB1_0)
+	default:
+		panic(op)
+	}
+}
+
+// DataBits returns the number of data bits which should follow this op
+func (op Op) DataBits() int {
+	switch {
+	case op >= LiteralB8 && op <= LiteralB256:
+		return 8 * (int(op-LiteralB8) + 1)
+	case op == LiteralKind:
+		return KindBits
+	case op == LiteralAnyType:
+		return AnyTypeBits
+	case op == LiteralAnyValue:
+		return AnyValueBits
+	default:
+		return 0
+	}
 }

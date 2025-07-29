@@ -545,22 +545,27 @@ func literalBits(x myc.AsBitArray) *Expr {
 		}
 	case 1:
 		return &Expr{
-			op:      spec.LiteralB1(int(ba.At(0))),
+			op:      spec.LiteralB1(int(ba.AsUint32())),
 			literal: x,
 		}
 	case 2:
 		return &Expr{
-			op:      spec.LiteralB2(int(ba.At(1))<<1 | int(ba.At(0))<<0),
+			op:      spec.LiteralB2(int(ba.AsUint32())),
 			literal: x,
 		}
 	case 3:
 		return &Expr{
-			op:      spec.LiteralB3(int(ba.At(2))<<2 | int(ba.At(1))<<1 | int(ba.At(0)<<0)),
+			op:      spec.LiteralB3(int(ba.AsUint32())),
+			literal: x,
+		}
+	case 4:
+		return &Expr{
+			op:      spec.LiteralB4(int(ba.AsUint32())),
 			literal: x,
 		}
 	case 8, 16, 32, 64, 128, 256:
 		return &Expr{
-			op:      spec.LiteralBytes(l / 8),
+			op:      spec.LiteralBx8(l / 8),
 			literal: x,
 		}
 	default:
