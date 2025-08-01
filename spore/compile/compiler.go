@@ -651,8 +651,8 @@ func (sc *Compiler) kind(ctx context.Context, eb EB, loc Loc, scope *Scope, e as
 		return lit(myc.PortKind()), nil
 	case spec.TC_Distinct:
 		return lit(myc.DistinctKind()), nil
-	case spec.TC_Expr:
-		panic("TC_Expr")
+	case spec.TC_AnyProg:
+		panic("TC_AnyProg")
 	case spec.TC_AnyType:
 		return lit(myc.AnyTypeKind()), nil
 	case spec.TC_AnyValue:

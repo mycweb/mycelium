@@ -21,14 +21,14 @@ func _() {
 	_ = x[TC_Fractal-10]
 	_ = x[TC_Port-11]
 	_ = x[TC_Distinct-12]
-	_ = x[TC_Expr-13]
+	_ = x[TC_AnyProg-13]
 	_ = x[TC_AnyType-14]
 	_ = x[TC_AnyValue-15]
 }
 
-const _TypeCode_name = "TC_KindTC_BitTC_ArrayTC_ProgTC_RefTC_SumTC_ProductTC_ListTC_LazyTC_LambdaTC_FractalTC_PortTC_DistinctTC_ExprTC_AnyTypeTC_AnyValue"
+const _TypeCode_name = "TC_KindTC_BitTC_ArrayTC_ProgTC_RefTC_SumTC_ProductTC_ListTC_LazyTC_LambdaTC_FractalTC_PortTC_DistinctTC_AnyProgTC_AnyTypeTC_AnyValue"
 
-var _TypeCode_index = [...]uint8{0, 7, 13, 21, 28, 34, 40, 50, 57, 64, 73, 83, 90, 101, 108, 118, 129}
+var _TypeCode_index = [...]uint8{0, 7, 13, 21, 28, 34, 40, 50, 57, 64, 73, 83, 90, 101, 111, 121, 132}
 
 func (i TypeCode) String() string {
 	if i >= TypeCode(len(_TypeCode_index)-1) {

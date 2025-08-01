@@ -75,8 +75,8 @@ func FractalKind() *Kind {
 	return &Kind{class: spec.TC_Fractal}
 }
 
-func ExprKind() *Kind {
-	return &Kind{class: spec.TC_Expr}
+func AnyProgKind() *Kind {
+	return &Kind{class: spec.TC_AnyProg}
 }
 
 func AnyValueKind() *Kind {
@@ -255,8 +255,8 @@ func (k *Kind) Zero() Value {
 		return NewPortType(Bottom(), Bottom(), Bottom(), Bottom())
 	case spec.TC_Distinct:
 		return NewDistinctType(ProductType{}, ProductType{})
-	case spec.TC_Expr:
-		return ExprType{}
+	case spec.TC_AnyProg:
+		return AnyProgType{}
 	case spec.TC_AnyType:
 		return AnyTypeType{}
 	case spec.TC_AnyValue:
@@ -304,8 +304,8 @@ func (k Kind) Make(x Value) Value {
 	case spec.TC_Distinct:
 		args := x.(Product)
 		return NewDistinctType(args[0].(Type), args[1])
-	case spec.TC_Expr:
-		return ExprType{}
+	case spec.TC_AnyProg:
+		return AnyProgType{}
 	case spec.TC_AnyType:
 		return AnyTypeType{}
 	case spec.TC_AnyValue:
@@ -340,8 +340,8 @@ func (k *Kind) Validate() error {
 		k2 = PortKind()
 	case spec.TC_Kind:
 		k2 = KindKind()
-	case spec.TC_Expr:
-		k2 = ExprKind()
+	case spec.TC_AnyProg:
+		k2 = AnyProgKind()
 	case spec.TC_AnyValue:
 		k2 = AnyValueKind()
 	case spec.TC_AnyType:

@@ -350,7 +350,7 @@ func requiresSalt(x Type) bool {
 	case *DistinctType:
 		// distinct types are only nominally different from their base type, so defer to base.
 		return requiresSalt(x.Base())
-	case ExprType:
+	case AnyProgType:
 		// ExprType is implemented as Product[Ref, ProgType]
 		return true
 	case AnyTypeType:

@@ -41,7 +41,7 @@ uncraft(craft(typeOf(x), x)) = x
 
 ```
 uncraft(ArrayType) -> Product[Type, Size]
-uncraft(ExprType) -> Product[Size]
+uncraft(ProgType) -> Product[Size]
 uncraft(RefType) -> Product[Type]
 uncraft(SumType) -> Array[Type, _]
 uncraft(ProductType) -> Array[Type, _]
@@ -64,20 +64,20 @@ SizeOf returns the size of values of a Type x.  It is not the size of x itself.
 Binds an additional parameter in the context with the value of `x`.
 Then let evaluates `body` in the new context with the additional bound parameter.
 
-### `lazy(out: Type, body: 'Expr) -> Lazy[out]`
+### `lazy(out: Type, body: AnyProg) -> Lazy[out]`
 Creates a lazy value from body.
 Body is not evaluated.
 Any parameters in body will be evaluated at the time lazy is called.
 If body, given its bound parameters does evaluate to type out, then a TypeError fault occurs.
 
-### `lambda(in: Type, out: Type, body: 'Expr) -> Lambda[in, out]`
+### `lambda(in: Type, out: Type, body: AnyProg) -> Lambda[in, out]`
 Creates a lambda value from body.
 Body is not evaluated.
 Parameters > 0 will be evaluated at the time lambda is called.
 Parameter 0 (written as `%0`) is assumed to be of type `in`.
 If body does not evaluated to type `out` then a TypeError fault occurs.
 
-### `fractal(body: 'Expr) -> FractalType`
+### `fractal(body: AnyProg) -> FractalType`
 Creates a Fractal type defined by the body expression, which *must* contain a self reference.
 
 ### `eval(x: Lazy[T]) -> T`

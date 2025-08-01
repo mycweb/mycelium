@@ -9,37 +9,37 @@ import (
 	"myceliumweb.org/mycelium/spec"
 )
 
-type ExprType struct{}
+type AnyProgType struct{}
 
-func (et ExprType) Type() Type {
-	return ExprKind()
+func (et AnyProgType) Type() Type {
+	return AnyProgKind()
 }
 
-func (et ExprType) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (et AnyProgType) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
 	return nil
 }
 
-func (et ExprType) Encode(BitBuf) {
+func (et AnyProgType) Encode(BitBuf) {
 }
 
-func (et ExprType) Decode(BitBuf, LoadFunc) error {
+func (et AnyProgType) Decode(BitBuf, LoadFunc) error {
 	return nil
 }
 
-func (et ExprType) Zero() Value {
+func (et AnyProgType) Zero() Value {
 	pt := ProgType{}
 	return NewExpr(*pt.Zero().(*Prog))
 }
 
-func (et ExprType) SizeOf() int {
+func (et AnyProgType) SizeOf() int {
 	return spec.ExprTypeBits
 }
 
-func (et ExprType) Components() iter.Seq[Value] {
+func (et AnyProgType) Components() iter.Seq[Value] {
 	return emptyIter
 }
-func (ExprType) isType()  {}
-func (ExprType) isValue() {}
+func (AnyProgType) isType()  {}
+func (AnyProgType) isValue() {}
 
 var _ Value = &Expr{}
 
@@ -64,7 +64,7 @@ func (e *Expr) Prog() Prog {
 }
 
 func (e *Expr) Type() Type {
-	return ExprType{}
+	return AnyProgType{}
 }
 
 func (e *Expr) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {

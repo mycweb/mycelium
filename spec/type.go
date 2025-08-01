@@ -19,7 +19,7 @@ const (
 	TC_Fractal
 	TC_Port
 	TC_Distinct
-	TC_Expr
+	TC_AnyProg
 	TC_AnyType
 	TC_AnyValue
 )
