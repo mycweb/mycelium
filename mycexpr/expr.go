@@ -24,17 +24,17 @@ type Expr struct {
 	literal myc.Value
 }
 
-func FromMycelium(x *myc.Expr) *Expr {
+func FromMycelium(x *myc.AnyProg) *Expr {
 	var e Expr
 	cache := make(map[uint32]*Expr)
 	e.decode(x.Prog(), cache)
 	return &e
 }
 
-func (e *Expr) Build() *myc.Expr {
+func (e *Expr) Build() *myc.AnyProg {
 	cache := make(map[*Expr]uint32)
 	prog := e.encode(nil, cache)
-	return myc.NewExpr(prog)
+	return myc.NewAnyProg(prog)
 }
 
 func (e *Expr) encode(out myc.Prog, cache map[*Expr]uint32) myc.Prog {

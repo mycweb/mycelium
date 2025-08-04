@@ -363,7 +363,7 @@ func (c *Compiler) loadType(ctx context.Context, at AnyType) (Type, error) {
 }
 
 func (c *Compiler) expandFractalType(ctx context.Context, ft FractalType) (Type, error) {
-	body, err := loadExpr(ctx, c.store, ft.GetRef(), ft.GetExprType())
+	body, err := loadAnyProg(ctx, c.store, ft.GetRef(), ft.GetExprType())
 	if err != nil {
 		return Type{}, err
 	}
@@ -449,7 +449,7 @@ func SizeOf(ctx context.Context, s cadata.Getter, x AnyType) (int, error) {
 		if err := loadWords(ctx, s, x.GetRef(), ft[:]); err != nil {
 			return 0, err
 		}
-		body, err := loadExpr(ctx, s, ft.GetRef(), ft.GetExprType())
+		body, err := loadAnyProg(ctx, s, ft.GetRef(), ft.GetExprType())
 		if err != nil {
 			return 0, err
 		}

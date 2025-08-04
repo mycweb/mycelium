@@ -79,17 +79,17 @@ func (lt *LambdaType) Decode(bb BitBuf, load LoadFunc) error {
 
 func (lt *LambdaType) Zero() Value {
 	body := Prog{Literal(lt.Out().Zero())}
-	return &Lambda{ty: lt, body: *NewExpr(body)}
+	return &Lambda{ty: lt, body: *NewAnyProg(body)}
 }
 
 type Lambda struct {
 	ty   *LambdaType
-	body Expr
+	body AnyProg
 }
 
 // NewLambda creates a new Lambda from a body
 // - body must not contain free parameters
-func NewLambda(in Type, out Type, body *Expr) (*Lambda, error) {
+func NewLambda(in Type, out Type, body *AnyProg) (*Lambda, error) {
 	in = unwrapAnyType(in)
 	out = unwrapAnyType(out)
 	if body == nil {
@@ -122,7 +122,7 @@ func (la *Lambda) Encode(buf BitBuf) {
 }
 
 func (la *Lambda) Decode(buf BitBuf, load LoadFunc) error {
-	var body Expr
+	var body AnyProg
 	if err := body.Decode(buf, load); err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (la *Lambda) String() string {
 	return fmt.Sprintf("|%v => %v|", la.ty.In(), la.ty.Out())
 }
 
-func (la *Lambda) Body() *Expr {
+func (la *Lambda) Body() *AnyProg {
 	return &la.body
 }
 

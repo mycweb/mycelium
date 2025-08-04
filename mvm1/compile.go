@@ -72,7 +72,7 @@ func (c *Compiler) makeLazy(ctx context.Context, mc machCtx, mprog myc.Prog) (*L
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := myc.ValidateBody(myc.NewExpr(body), 0, !mc.self.IsZero()); err != nil {
+	if err := myc.ValidateBody(myc.NewAnyProg(body), 0, !mc.self.IsZero()); err != nil {
 		return nil, nil, err
 	}
 	prog, err := c.compile(ctx, mc, body)
@@ -120,7 +120,7 @@ func (c *Compiler) makeLambda(ctx context.Context, mc machCtx, inAT, outAT AnyTy
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := myc.ValidateBody(myc.NewExpr(body), 1, true); err != nil {
+	if err := myc.ValidateBody(myc.NewAnyProg(body), 1, true); err != nil {
 		return nil, nil, err
 	}
 	prog, err := c.compile(ctx, mc, body)

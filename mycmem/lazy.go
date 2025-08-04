@@ -67,7 +67,7 @@ func (lt *LazyType) Decode(bb BitBuf, load LoadFunc) error {
 
 func (lt *LazyType) Zero() Value {
 	return &Lazy{
-		body: *NewExpr(Prog{
+		body: *NewAnyProg(Prog{
 			Literal(lt.Elem().Type()),
 		}),
 		ty: lt,
@@ -76,10 +76,10 @@ func (lt *LazyType) Zero() Value {
 
 type Lazy struct {
 	ty   *LazyType
-	body Expr
+	body AnyProg
 }
 
-func NewLazy(ty Type, body *Expr) (*Lazy, error) {
+func NewLazy(ty Type, body *AnyProg) (*Lazy, error) {
 	if err := ValidateBody(body, 0, false); err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (l *Lazy) Type() Type {
 	return l.ty
 }
 
-func (l *Lazy) Body() *Expr {
+func (l *Lazy) Body() *AnyProg {
 	return &l.body
 }
 

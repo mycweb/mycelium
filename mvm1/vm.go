@@ -457,7 +457,7 @@ func (vm *VM) discard(words int) {
 
 // loadLazy loads the code for a Lazy into the cache
 func (vm *VM) loadLazy(x Lazy) ([]I, error) {
-	body, err := loadExpr(vm.ctx, vm.store, x.GetRef(), x.GetProgType())
+	body, err := loadAnyProg(vm.ctx, vm.store, x.GetRef(), x.GetProgType())
 	if err != nil {
 		return nil, err
 	}
@@ -476,7 +476,7 @@ func (vm *VM) loadLambda(lt LambdaType, lam Lambda) ([]I, error) {
 	if prog, exists := vm.funcCache.Get(fp); exists {
 		return prog, nil
 	}
-	e, err := loadExpr(vm.ctx, vm.store, lam.GetRef(), lam.GetProgType())
+	e, err := loadAnyProg(vm.ctx, vm.store, lam.GetRef(), lam.GetProgType())
 	if err != nil {
 		return nil, err
 	}
@@ -756,7 +756,7 @@ func (vm *VM) lazy(et ProgType, layout []Type) {
 	// pop
 	expr := vm.popExpr()
 	ref := expr.GetRef()
-	e, err := loadExpr(vm.ctx, vm.store, ref, et)
+	e, err := loadAnyProg(vm.ctx, vm.store, ref, et)
 	if err != nil {
 		vm.fail(err)
 		return
@@ -784,7 +784,7 @@ func (vm *VM) lambda(et ProgType, layout []Type, scratch []int) {
 	out := vm.popAnyType()
 	in := vm.popAnyType()
 
-	e, err := loadExpr(vm.ctx, vm.store, ref, et)
+	e, err := loadAnyProg(vm.ctx, vm.store, ref, et)
 	if err != nil {
 		vm.fail(err)
 		return
@@ -875,13 +875,13 @@ func divCeil(x, d int) int {
 	return q
 }
 
-func loadExpr(ctx context.Context, s cadata.Getter, ref Ref, et ProgType) (*mycelium.Expr, error) {
+func loadAnyProg(ctx context.Context, s cadata.Getter, ref Ref, et ProgType) (*mycelium.AnyProg, error) {
 	buf := make([]byte, spec.ExprBits/8)
 	wordsToBytes(ref[:], buf[:32])
 	wordsToBytes(et[:], buf[32:])
 
 	bb := bitbuf.FromBytes(buf)
-	var expr mycelium.Expr
+	var expr mycelium.AnyProg
 	if err := expr.Decode(bb, func(ref mycelium.Ref) (mycelium.Value, error) {
 		return mycelium.Load(ctx, s, ref)
 	}); err != nil {

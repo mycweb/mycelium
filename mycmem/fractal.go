@@ -11,11 +11,11 @@ import (
 )
 
 type FractalType struct {
-	expr     Expr
+	expr     AnyProg
 	expanded Type
 }
 
-func NewFractalType(body *Expr) (*FractalType, error) {
+func NewFractalType(body *AnyProg) (*FractalType, error) {
 	if err := ValidateBody(body, 0, true); err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (tt *FractalType) String() string {
 	return fmt.Sprintf("Fractal{%s}", tt.expr.String())
 }
 
-func (te *FractalType) Body() *Expr {
+func (te *FractalType) Body() *AnyProg {
 	return &te.expr
 }
 

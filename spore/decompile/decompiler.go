@@ -66,7 +66,7 @@ func (dc *Decompiler) decompile(x mycmem.Value) (ret ast.Node) {
 	case *mycmem.Array:
 		return dc.astFromArray(x)
 	case *mycmem.Prog:
-		expr := mycexpr.FromMycelium(mycmem.NewExpr(*x))
+		expr := mycexpr.FromMycelium(mycmem.NewAnyProg(*x))
 		return dc.astFromExpr(expr)
 	case *mycmem.Ref:
 		return ast.SExpr{ast.Op("ref"), dc.decompile(x.ElemType()), ast.Ref(x.Data())}

@@ -244,7 +244,7 @@ func (k *Kind) Zero() Value {
 	case spec.TC_Lambda:
 		return NewLambdaType(SumType{}, ProductType{})
 	case spec.TC_Fractal:
-		ft, err := NewFractalType(NewExpr(Prog{
+		ft, err := NewFractalType(NewAnyProg(Prog{
 			Literal(SumType{}),
 		}))
 		if err != nil {

@@ -28,7 +28,7 @@ func (et AnyProgType) Decode(BitBuf, LoadFunc) error {
 
 func (et AnyProgType) Zero() Value {
 	pt := ProgType{}
-	return NewExpr(*pt.Zero().(*Prog))
+	return NewAnyProg(*pt.Zero().(*Prog))
 }
 
 func (et AnyProgType) SizeOf() int {
@@ -41,33 +41,33 @@ func (et AnyProgType) Components() iter.Seq[Value] {
 func (AnyProgType) isType()  {}
 func (AnyProgType) isValue() {}
 
-var _ Value = &Expr{}
+var _ Value = &AnyProg{}
 
-// Expr holds a Product[Ref[Prog[_]], ProgType]
+// AnyProg holds a Product[Ref[Prog[_]], ProgType]
 // The Ref points to a Prog
 // The size holds the size of the program.
-type Expr struct {
+type AnyProg struct {
 	prog Prog
 	ref  *Ref
 }
 
-func NewExpr(prog Prog) *Expr {
+func NewAnyProg(prog Prog) *AnyProg {
 	ref := mkRef(&prog)
-	return &Expr{
+	return &AnyProg{
 		prog: prog,
 		ref:  &ref,
 	}
 }
 
-func (e *Expr) Prog() Prog {
+func (e *AnyProg) Prog() Prog {
 	return e.prog
 }
 
-func (e *Expr) Type() Type {
+func (e *AnyProg) Type() Type {
 	return AnyProgType{}
 }
 
-func (e *Expr) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (e *AnyProg) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
 	if yes, err := dst.Exists(ctx, &e.ref.cid); err != nil {
 		return err
 	} else if yes {
@@ -84,14 +84,14 @@ func (e *Expr) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.
 	return nil
 }
 
-func (e *Expr) Encode(bb BitBuf) {
+func (e *AnyProg) Encode(bb BitBuf) {
 	Product{
 		e.ref,
 		e.prog.Type(),
 	}.Encode(bb)
 }
 
-func (e *Expr) Decode(bb BitBuf, load LoadFunc) error {
+func (e *AnyProg) Decode(bb BitBuf, load LoadFunc) error {
 	refbuf := bb.Slice(0, RefBits)
 	sizeBuf := bb.Slice(RefBits, bb.Len())
 
@@ -114,22 +114,22 @@ func (e *Expr) Decode(bb BitBuf, load LoadFunc) error {
 	return nil
 }
 
-func (e *Expr) Components() iter.Seq[Value] {
+func (e *AnyProg) Components() iter.Seq[Value] {
 	return func(yield func(Value) bool) {
 		_ = yield(e.ref) && yield(NewSize(e.prog.Size()))
 	}
 }
 
-func (*Expr) isValue() {}
+func (*AnyProg) isValue() {}
 
-func (e *Expr) String() string {
+func (e *AnyProg) String() string {
 	return fmt.Sprintf("Expr{progLen=%d}", len(e.prog))
 }
 
 // ValidateBody checks that the body does not contain any free parameters above level.
 // - ValidateBody(_, 0) is called by NewLazy
 // - ValidateBody(_, 1) is called by NewLambda
-func ValidateBody(body *Expr, level uint32, hasSelf bool) error {
+func ValidateBody(body *AnyProg, level uint32, hasSelf bool) error {
 	return validateBody(body.prog, level, hasSelf)
 }
 
