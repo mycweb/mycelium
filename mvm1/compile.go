@@ -344,7 +344,7 @@ func (c *Compiler) compileAnyTypeTo(ctx context.Context, mc machCtx, a0, a1 myc.
 	if err != nil {
 		return nil, err
 	}
-	toT2 := ty.Type2
+	toT2 := Type2(ty.Data[0:1])
 	size := ty.Size
 	return &Prog{
 		Type: ty,
@@ -903,31 +903,6 @@ func (c *Compiler) compileSimple(ctx context.Context, mc machCtx, code spec.Op, 
 		}, nil
 
 	// List
-	case spec.ListFrom:
-		if argTypes[0].Type2.TypeCode() != spec.TC_Ref {
-			// TODO: also check that it is a Ref of an Array.
-			return nil, fmt.Errorf("ListFrom on non Ref[Array[_, _]]: %v", argTypes[0])
-		}
-		refType := argTypes[0]
-		arrType, err := c.getTypeParam(ctx, &refType, 0)
-		if err != nil {
-			return nil, err
-		}
-		elemTy, err := c.getTypeParam(ctx, &arrType, 0)
-		if err != nil {
-			return nil, err
-		}
-		l := int(arrType.Data[9])
-		outTy, err := c.makeHType(ctx, spec.TC_List, []Type{elemTy})
-		if err != nil {
-			return nil, err
-		}
-		return &Prog{
-			Type: outTy,
-			I: []I{
-				pushI{x: uint32(l)},
-			},
-		}, nil
 	case spec.Gather:
 		panic("Gather")
 

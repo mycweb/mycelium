@@ -152,9 +152,7 @@ const (
 )
 
 const (
-	// ListFrom
-	// DEPRECATED
-	ListFrom Op = 7*section + iota
+	_ Op = 7*section + iota
 	// ListTo
 	// DEPRECATED
 	ListTo
@@ -162,7 +160,7 @@ const (
 	// AnyTypeFrom: (x: Type) -> AnyType
 	// DEPRECATED
 	AnyTypeFrom
-	// AnyTypeTo: (x: Kind) -> x
+	// AnyTypeTo: (x: AnyType, T2: Type2) -> T2
 	// DEPRECATED
 	AnyTypeTo
 	// AnyTypeElemType: (x: AnyType) -> Kind

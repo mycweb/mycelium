@@ -31,5 +31,3 @@
 (defc Boolean (Distinct Bit "Boolean"))
 (defc true (distinct Boolean 1))
 (defc false (distinct Boolean 0))
-
-(defm newList a (!listFrom a))

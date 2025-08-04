@@ -63,15 +63,14 @@ var infos = func() (ret [1 << 16]Info) {
 		Output:   {2},
 		Interact: {2},
 
-		Gather:   {1},
-		Slice:    {3},
-		ListFrom: {1},
-		ListTo:   {2},
+		Gather: {1},
+		Slice:  {3},
+		ListTo: {2},
 
 		AnyValueFrom: {1},
 		AnyValueTo:   {2},
 		AnyTypeFrom:  {1},
-		AnyTypeTo:    {1},
+		AnyTypeTo:    {2},
 
 		// Accessors
 		Field:   {2},

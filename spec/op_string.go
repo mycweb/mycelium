@@ -48,7 +48,6 @@ func _() {
 	_ = x[Input-80]
 	_ = x[Output-81]
 	_ = x[Interact-82]
-	_ = x[ListFrom-112]
 	_ = x[ListTo-113]
 	_ = x[AnyTypeFrom-114]
 	_ = x[AnyTypeTo-115]
@@ -73,7 +72,7 @@ func _() {
 	_ = x[ParamN-255]
 }
 
-const _Op_name = "UnknownPassEqualCraftUncraftRootEncodeDecodeTypeOfSizeOfMaxSizeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
+const _Op_name = "UnknownPassEqualCraftUncraftRootEncodeDecodeTypeOfSizeOfMaxSizeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicPostLoadInputOutputInteractListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
 
 var _Op_map = map[Op]string{
 	0:   _Op_name[0:7],
@@ -116,29 +115,28 @@ var _Op_map = map[Op]string{
 	80:  _Op_name[211:216],
 	81:  _Op_name[216:222],
 	82:  _Op_name[222:230],
-	112: _Op_name[230:238],
-	113: _Op_name[238:244],
-	114: _Op_name[244:255],
-	115: _Op_name[255:264],
-	116: _Op_name[264:279],
-	117: _Op_name[279:291],
-	118: _Op_name[291:301],
-	119: _Op_name[301:317],
-	128: _Op_name[317:321],
-	129: _Op_name[321:332],
-	130: _Op_name[332:346],
-	131: _Op_name[346:361],
-	136: _Op_name[361:370],
-	137: _Op_name[370:379],
-	138: _Op_name[379:388],
-	139: _Op_name[388:397],
-	140: _Op_name[397:407],
-	141: _Op_name[407:417],
-	142: _Op_name[417:427],
-	143: _Op_name[427:438],
-	144: _Op_name[438:449],
-	192: _Op_name[449:455],
-	255: _Op_name[455:461],
+	113: _Op_name[230:236],
+	114: _Op_name[236:247],
+	115: _Op_name[247:256],
+	116: _Op_name[256:271],
+	117: _Op_name[271:283],
+	118: _Op_name[283:293],
+	119: _Op_name[293:309],
+	128: _Op_name[309:313],
+	129: _Op_name[313:324],
+	130: _Op_name[324:338],
+	131: _Op_name[338:353],
+	136: _Op_name[353:362],
+	137: _Op_name[362:371],
+	138: _Op_name[371:380],
+	139: _Op_name[380:389],
+	140: _Op_name[389:399],
+	141: _Op_name[399:409],
+	142: _Op_name[409:419],
+	143: _Op_name[419:430],
+	144: _Op_name[430:441],
+	192: _Op_name[441:447],
+	255: _Op_name[447:453],
 }
 
 func (i Op) String() string {

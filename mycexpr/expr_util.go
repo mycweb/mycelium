@@ -170,14 +170,28 @@ func (eb EB) Decode(ty *Expr, data *Expr) *Expr {
 	return newExpr(spec.Decode, ty, data)
 }
 
+// Transcode is short for Encode followed by Decode
+func (eb EB) Transcode(outTy *Expr, data *Expr) *Expr {
+	return eb.Decode(outTy, eb.Encode(data))
+}
+
 // ListFrom takes a Ref[Array[T, _]] and returns a List[T]
 func (eb EB) ListFrom(x *Expr) *Expr {
-	return newExpr(spec.ListFrom, x)
+	arrayTy := eb.AnyTypeTo((eb.RefTypeElem(eb.TypeOf(x))), eb.Lit(myc.ArrayKind()))
+	listTy := eb.ListType(eb.ArrayTypeElem(arrayTy))
+	return eb.Transcode(
+		listTy,
+		eb.Product(x, eb.ArrayTypeLen(arrayTy)),
+	)
 }
 
 // ListTo takes a List[T] and returns a Ref[Array[T, n]]
 func (eb EB) ListTo(x *Expr, n int) *Expr {
 	return newExpr(spec.ListTo, x, eb.B32(uint32(n)))
+}
+
+func (eb EB) AnyTypeTo(at *Expr, toTy *Expr) *Expr {
+	return newExpr(spec.AnyTypeTo, at, toTy)
 }
 
 func (eb EB) String(x string) *Expr {
