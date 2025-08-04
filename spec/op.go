@@ -153,9 +153,6 @@ const (
 
 const (
 	_ Op = 7*section + iota
-	// ListTo
-	// DEPRECATED
-	ListTo
 
 	// AnyTypeFrom: (x: Type) -> AnyType
 	// DEPRECATED

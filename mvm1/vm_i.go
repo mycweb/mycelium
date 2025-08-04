@@ -154,12 +154,6 @@ type arrayGetI struct {
 
 // lists
 
-type listToI struct {
-	elemSize   int
-	desiredLen int
-	baseI
-}
-
 type listGetI struct {
 	elemSize int
 	baseI

@@ -182,8 +182,6 @@ func (c *Compiler) compile(ctx context.Context, mc machCtx, x myc.Prog) (*Prog, 
 		return c.compileArrayEmpty(ctx, mc, x.Input(0))
 	case spec.MakeSum:
 		return c.compileMakeSum(ctx, mc, x.Input(0), x.Input(1), x.Input(2))
-	case spec.ListTo:
-		return c.compileListTo(ctx, mc, x.Input(0), x.Input(1))
 	case spec.AnyTypeTo:
 		return c.compileAnyTypeTo(ctx, mc, x.Input(0), x.Input(1))
 	case spec.AnyValueTo:
@@ -291,46 +289,6 @@ func (c *Compiler) compileMakeSum(ctx context.Context, mc machCtx, a0, a1, a2 my
 			inputSize: inputSize,
 			tagOffset: tagOffset,
 			tagSize:   tagSize,
-		}),
-	}, nil
-}
-
-func (c *Compiler) compileListTo(ctx context.Context, mc machCtx, a0, a1 myc.Prog) (*Prog, error) {
-	sizeProg, err := c.compile(ctx, mc, a1)
-	if err != nil {
-		return nil, err
-	}
-	st, err := c.sizeType(ctx)
-	if err != nil {
-		return nil, err
-	}
-	ws, err := c.evalNow(ctx, sizeProg, &st)
-	if err != nil {
-		return nil, err
-	}
-	desiredLen := int(ws[0])
-	x, err := c.compile(ctx, mc, a0)
-	if err != nil {
-		return nil, err
-	}
-	elemTy, err := c.getTypeParam(ctx, &x.Type, 0)
-	if err != nil {
-		return nil, err
-	}
-	elemSize := elemTy.Size
-	arrTy, err := c.arrayType(ctx, elemTy, desiredLen)
-	if err != nil {
-		return nil, err
-	}
-	outTy, err := c.refType(ctx, arrTy)
-	if err != nil {
-		return nil, err
-	}
-	return &Prog{
-		Type: outTy,
-		I: append(x.I, listToI{
-			elemSize:   elemSize,
-			desiredLen: desiredLen,
 		}),
 	}, nil
 }

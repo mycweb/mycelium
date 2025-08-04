@@ -187,7 +187,10 @@ func (eb EB) ListFrom(x *Expr) *Expr {
 
 // ListTo takes a List[T] and returns a Ref[Array[T, n]]
 func (eb EB) ListTo(x *Expr, n int) *Expr {
-	return newExpr(spec.ListTo, x, eb.B32(uint32(n)))
+	elemAT := eb.ListTypeElem(eb.TypeOf(x))
+	arrTy := eb.ArrayType(elemAT, eb.B32(uint32(n)))
+	refTy := eb.RefType(arrTy)
+	return eb.Decode(refTy, eb.Section(eb.Encode(x), 0, spec.RefBits))
 }
 
 func (eb EB) AnyTypeTo(at *Expr, toTy *Expr) *Expr {

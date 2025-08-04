@@ -156,8 +156,6 @@ func (vm *VM) step(ix I) {
 	case portInteractI:
 		vm.portInteract(ix.consumeWords, ix.produceWords)
 
-	case listToI:
-		vm.listTo(ix)
 	case listGetI:
 		vm.listGet(ix)
 	case anyTypeFromI:
@@ -731,15 +729,6 @@ func (vm *VM) listGet(ix listGetI) {
 	vm.load(arraySize)
 	vm.push(idx)
 	vm.arrayGet(arrayGetI{len: int(list.GetLen()), elemSize: ix.elemSize})
-}
-
-func (vm *VM) listTo(ix listToI) {
-	li := vm.popList()
-	if ix.desiredLen != int(li.GetLen()) {
-		vm.fail(fmt.Errorf("ListTo mismatch length ACTUAL: %d, REQUESTED: %d", li.GetLen(), ix.desiredLen))
-		return
-	}
-	vm.pushRef(li.GetRef())
 }
 
 func (vm *VM) checkBounds(gteq, lt int) {
