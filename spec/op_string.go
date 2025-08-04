@@ -13,13 +13,12 @@ func _() {
 	_ = x[Equal-2]
 	_ = x[Craft-3]
 	_ = x[Uncraft-4]
-	_ = x[TypeOf-5]
-	_ = x[SizeOf-6]
-	_ = x[MaxSize-7]
-	_ = x[Fingerprint-8]
-	_ = x[Root-9]
-	_ = x[Encode-10]
-	_ = x[Decode-11]
+	_ = x[Root-5]
+	_ = x[Encode-6]
+	_ = x[Decode-7]
+	_ = x[TypeOf-8]
+	_ = x[SizeOf-9]
+	_ = x[MaxSize-10]
 	_ = x[ZERO-16]
 	_ = x[ONE-31]
 	_ = x[ArrayEmpty-32]
@@ -74,7 +73,7 @@ func _() {
 	_ = x[ParamN-255]
 }
 
-const _Op_name = "UnknownPassEqualCraftUncraftTypeOfSizeOfMaxSizeFingerprintRootEncodeDecodeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
+const _Op_name = "UnknownPassEqualCraftUncraftRootEncodeDecodeTypeOfSizeOfMaxSizeZEROONEArrayEmptyArrayUnitProductEmptyProductUnitConcatMakeSumWhichFieldSlotSectionGatherSliceLetLazyLambdaFractalEvalApplyMuxBranchTryPanicPostLoadInputOutputInteractListFromListToAnyTypeFromAnyTypeToAnyTypeElemTypeAnyValueFromAnyValueToAnyValueElemTypeSelfLiteralKindLiteralAnyTypeLiteralAnyValueLiteralB0LiteralB2LiteralB4LiteralB8LiteralB16LiteralB32LiteralB64LiteralB128LiteralB256Param0ParamN"
 
 var _Op_map = map[Op]string{
 	0:   _Op_name[0:7],
@@ -82,65 +81,64 @@ var _Op_map = map[Op]string{
 	2:   _Op_name[11:16],
 	3:   _Op_name[16:21],
 	4:   _Op_name[21:28],
-	5:   _Op_name[28:34],
-	6:   _Op_name[34:40],
-	7:   _Op_name[40:47],
-	8:   _Op_name[47:58],
-	9:   _Op_name[58:62],
-	10:  _Op_name[62:68],
-	11:  _Op_name[68:74],
-	16:  _Op_name[74:78],
-	31:  _Op_name[78:81],
-	32:  _Op_name[81:91],
-	33:  _Op_name[91:100],
-	34:  _Op_name[100:112],
-	35:  _Op_name[112:123],
-	36:  _Op_name[123:129],
-	37:  _Op_name[129:136],
-	38:  _Op_name[136:141],
-	39:  _Op_name[141:146],
-	40:  _Op_name[146:150],
-	41:  _Op_name[150:157],
-	42:  _Op_name[157:163],
-	43:  _Op_name[163:168],
-	48:  _Op_name[168:171],
-	49:  _Op_name[171:175],
-	50:  _Op_name[175:181],
-	51:  _Op_name[181:188],
-	52:  _Op_name[188:192],
-	53:  _Op_name[192:197],
-	54:  _Op_name[197:200],
-	55:  _Op_name[200:206],
-	56:  _Op_name[206:209],
-	57:  _Op_name[209:214],
-	64:  _Op_name[214:218],
-	65:  _Op_name[218:222],
-	80:  _Op_name[222:227],
-	81:  _Op_name[227:233],
-	82:  _Op_name[233:241],
-	112: _Op_name[241:249],
-	113: _Op_name[249:255],
-	114: _Op_name[255:266],
-	115: _Op_name[266:275],
-	116: _Op_name[275:290],
-	117: _Op_name[290:302],
-	118: _Op_name[302:312],
-	119: _Op_name[312:328],
-	128: _Op_name[328:332],
-	129: _Op_name[332:343],
-	130: _Op_name[343:357],
-	131: _Op_name[357:372],
-	136: _Op_name[372:381],
-	137: _Op_name[381:390],
-	138: _Op_name[390:399],
-	139: _Op_name[399:408],
-	140: _Op_name[408:418],
-	141: _Op_name[418:428],
-	142: _Op_name[428:438],
-	143: _Op_name[438:449],
-	144: _Op_name[449:460],
-	192: _Op_name[460:466],
-	255: _Op_name[466:472],
+	5:   _Op_name[28:32],
+	6:   _Op_name[32:38],
+	7:   _Op_name[38:44],
+	8:   _Op_name[44:50],
+	9:   _Op_name[50:56],
+	10:  _Op_name[56:63],
+	16:  _Op_name[63:67],
+	31:  _Op_name[67:70],
+	32:  _Op_name[70:80],
+	33:  _Op_name[80:89],
+	34:  _Op_name[89:101],
+	35:  _Op_name[101:112],
+	36:  _Op_name[112:118],
+	37:  _Op_name[118:125],
+	38:  _Op_name[125:130],
+	39:  _Op_name[130:135],
+	40:  _Op_name[135:139],
+	41:  _Op_name[139:146],
+	42:  _Op_name[146:152],
+	43:  _Op_name[152:157],
+	48:  _Op_name[157:160],
+	49:  _Op_name[160:164],
+	50:  _Op_name[164:170],
+	51:  _Op_name[170:177],
+	52:  _Op_name[177:181],
+	53:  _Op_name[181:186],
+	54:  _Op_name[186:189],
+	55:  _Op_name[189:195],
+	56:  _Op_name[195:198],
+	57:  _Op_name[198:203],
+	64:  _Op_name[203:207],
+	65:  _Op_name[207:211],
+	80:  _Op_name[211:216],
+	81:  _Op_name[216:222],
+	82:  _Op_name[222:230],
+	112: _Op_name[230:238],
+	113: _Op_name[238:244],
+	114: _Op_name[244:255],
+	115: _Op_name[255:264],
+	116: _Op_name[264:279],
+	117: _Op_name[279:291],
+	118: _Op_name[291:301],
+	119: _Op_name[301:317],
+	128: _Op_name[317:321],
+	129: _Op_name[321:332],
+	130: _Op_name[332:346],
+	131: _Op_name[346:361],
+	136: _Op_name[361:370],
+	137: _Op_name[370:379],
+	138: _Op_name[379:388],
+	139: _Op_name[388:397],
+	140: _Op_name[397:407],
+	141: _Op_name[407:417],
+	142: _Op_name[417:427],
+	143: _Op_name[427:438],
+	144: _Op_name[438:449],
+	192: _Op_name[449:455],
+	255: _Op_name[455:461],
 }
 
 func (i Op) String() string {

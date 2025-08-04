@@ -22,20 +22,19 @@ const (
 	Craft
 	// Uncraft returns a Product representation of a Value.
 	Uncraft
-	// TypeOf: (x: 'Any) RealType
-	TypeOf
-	// SizeOf: (Type) -> Size
-	SizeOf
-	// MaxSize: () -> Size
-	MaxSize
-	// Fingerprint: (x) -> Array[Bit, 256]
-	Fingerprint
 	// Root: () -> Type2
 	Root
 	// Encode: (x: T) -> Array[Bit, SizeOf(T)]
 	Encode
 	// Decode: (T: Type, data: Array[Bit, SizeOf(T)]) -> T
 	Decode
+
+	// TypeOf: (x: 'Any) RealType
+	TypeOf
+	// SizeOf: (Type) -> Size
+	SizeOf
+	// MaxSize: () -> Size
+	MaxSize
 )
 
 const (
