@@ -10,6 +10,7 @@ tidy: generate
 	go vet ./...
 
 test:
+	just mvm2/test
 	mkdir -p ./build/out
 	go test -coverprofile=build/out/go-cover ./...
 	just spore/test
