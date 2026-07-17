@@ -2,7 +2,7 @@ package spec
 
 // KindCode is used in the encoding of Kinds
 //
-//go:generate go run golang.org/x/tools/cmd/stringer -type=TypeCode
+// //go:generate go run golang.org/x/tools/cmd/stringer -type=TypeCode
 type TypeCode uint8
 
 const (
