@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 	"strings"
 
 	"go.brendoncarroll.net/exp/slices2"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -91,7 +91,7 @@ func (pt ProductType) Components() iter.Seq[Value] {
 	}
 }
 
-func (pt ProductType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (pt ProductType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	for _, ty := range pt {
 		at := NewAnyType(ty)
 		if err := at.PullInto(ctx, dst, src); err != nil {
@@ -154,7 +154,7 @@ func (v Product) String() string {
 	return sb.String()
 }
 
-func (p Product) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (p Product) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return pullIntoBatch(ctx, dst, src, p...)
 }
 

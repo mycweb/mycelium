@@ -2,13 +2,13 @@ package mycmem_test
 
 import (
 	"fmt"
+	"myceliumweb.org/mycelium"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/testutil"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/myctests"
@@ -43,7 +43,7 @@ func TestCID(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc)
 			id := myc.ContentID(tc)
-			require.NotEqual(t, cadata.ID{}, id)
+			require.NotEqual(t, mycelium.CID{}, id)
 		})
 	}
 }
@@ -220,6 +220,6 @@ func TestGolden(t *testing.T) {
 	}
 }
 
-func testValues(s cadata.PostExister) []myc.Value {
+func testValues(s mycelium.WO) []myc.Value {
 	return myctests.InterestingValues(s)
 }

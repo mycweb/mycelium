@@ -7,7 +7,6 @@ import (
 
 	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -17,7 +16,7 @@ type Value interface {
 	Type() Type
 	Encode(BitBuf)
 	Decode(BitBuf, LoadFunc) error
-	PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error
+	PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error
 
 	Components() iter.Seq[Value]
 	isValue()
@@ -33,7 +32,7 @@ func Fingerprint(x Value) [32]byte {
 	if k, ok := x.(*Kind); ok && k.class == spec.TC_Kind {
 		return mycelium.Hash(nil, bb.Bytes())
 	} else {
-		salt := cadata.ID(Fingerprint(x.Type()))
+		salt := mycelium.CID(Fingerprint(x.Type()))
 		return mycelium.Hash(&salt, bb.Bytes())
 	}
 }

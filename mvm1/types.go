@@ -6,7 +6,6 @@ import (
 
 	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 )
@@ -44,7 +43,7 @@ func (at2 Type2) Data() uint32 {
 	return uint32(at2[0] >> 8)
 }
 
-func (t2 Type2) PostAnyType(ctx context.Context, s cadata.Poster) (ret AnyType, _ error) {
+func (t2 Type2) PostAnyType(ctx context.Context, s mycelium.WO) (ret AnyType, _ error) {
 	// typeOf(Type2) is always Type2 so we use the zero salt
 	ref, err := postWords(ctx, s, nil, t2.Size(), t2[:])
 	if err != nil {

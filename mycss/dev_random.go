@@ -7,7 +7,6 @@ import (
 
 	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -37,7 +36,7 @@ func GenRandomExpr(dev *Expr, n uint32) *Expr {
 
 type randomDev struct{}
 
-func (rs randomDev) portInteract(ctx context.Context, s cadata.Store, buf []mvm1.Word) error {
+func (rs randomDev) portInteract(ctx context.Context, s mycelium.RW, buf []mvm1.Word) error {
 	size := int(buf[0])
 	if size >= mycelium.MaxSizeBits {
 		return fmt.Errorf("random: value would exceed max size")

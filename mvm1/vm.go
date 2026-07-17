@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	core "myceliumweb.org/mycelium"
 	"slices"
 
 	"github.com/hashicorp/golang-lru/v2/simplelru"
 
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	mycelium "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 )
@@ -23,7 +23,7 @@ const (
 )
 
 type VM struct {
-	store cadata.Store
+	store core.RW
 
 	prog  []I
 	pc    uint32
@@ -41,7 +41,7 @@ type VM struct {
 	funcCache *simplelru.LRU[Fingerprint, []I]
 }
 
-func New(stackSize int, s cadata.Store, accels map[Fingerprint]AccelFunc) *VM {
+func New(stackSize int, s core.RW, accels map[Fingerprint]AccelFunc) *VM {
 	funcCache, err := simplelru.NewLRU[Fingerprint, []I](100, nil)
 	if err != nil {
 		panic(err)
@@ -201,7 +201,7 @@ func (vm *VM) SetProg(prog []I) {
 	vm.prog = prog
 }
 
-func (vm *VM) ImportLazy(ctx context.Context, src cadata.Getter, laz *mycelium.Lazy) error {
+func (vm *VM) ImportLazy(ctx context.Context, src core.RO, laz *mycelium.Lazy) error {
 	if err := laz.PullInto(ctx, vm.store, src); err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (vm *VM) PopLazy() (ret Lazy) {
 	return ret
 }
 
-func (vm *VM) ImportAnyValue(ctx context.Context, src cadata.Getter, x AnyValue) error {
+func (vm *VM) ImportAnyValue(ctx context.Context, src core.RO, x AnyValue) error {
 	if err := pullAnyValue(ctx, vm.store, src, x); err != nil {
 		return err
 	}
@@ -233,7 +233,7 @@ func (vm *VM) ImportAnyValue(ctx context.Context, src cadata.Getter, x AnyValue)
 	return nil
 }
 
-func (vm *VM) ExportAnyValue(ctx context.Context, dst cadata.PostExister) (AnyValue, error) {
+func (vm *VM) ExportAnyValue(ctx context.Context, dst core.WO) (AnyValue, error) {
 	if len(vm.stack) < len(AnyValue{}) {
 		return AnyValue{}, fmt.Errorf("stack too small to contain AnyValue. %d", len(vm.stack))
 	}
@@ -423,7 +423,7 @@ func (vm *VM) anyValueTo(ix anyValueToI) {
 	tag := ix.to.GetRef().CID()
 	cid := av.GetRef().CID()
 	buf := make([]byte, ix.outputBits)
-	n, err := vm.store.Get(vm.ctx, &cid, &tag, buf)
+	n, err := vm.store.Get(vm.ctx, cid, &tag, buf)
 	if err != nil {
 		vm.fail(err)
 		return
@@ -864,7 +864,7 @@ func divCeil(x, d int) int {
 	return q
 }
 
-func loadAnyProg(ctx context.Context, s cadata.Getter, ref Ref, et ProgType) (*mycelium.AnyProg, error) {
+func loadAnyProg(ctx context.Context, s core.RO, ref Ref, et ProgType) (*mycelium.AnyProg, error) {
 	buf := make([]byte, spec.ExprBits/8)
 	wordsToBytes(ref[:], buf[:32])
 	wordsToBytes(et[:], buf[32:])
@@ -912,7 +912,7 @@ func AlignSize(sizeBits int) int {
 	return sizeBits
 }
 
-func pullAnyValue(ctx context.Context, dst cadata.PostExister, src cadata.Getter, x AnyValue) error {
+func pullAnyValue(ctx context.Context, dst core.WO, src core.RO, x AnyValue) error {
 	val, err := mycelium.LoadRoot(ctx, src, x.AsBytes())
 	if err != nil {
 		return err
@@ -921,10 +921,10 @@ func pullAnyValue(ctx context.Context, dst cadata.PostExister, src cadata.Getter
 	return val.PullInto(ctx, dst, src)
 }
 
-func loadWords(ctx context.Context, s cadata.Getter, ref Ref, ws []Word) error {
+func loadWords(ctx context.Context, s core.RO, ref Ref, ws []Word) error {
 	cid := ref.CID()
 	buf := make([]byte, len(ws)*WordBits/8)
-	_, err := s.Get(ctx, &cid, nil, buf)
+	_, err := s.Get(ctx, cid, nil, buf)
 	if err != nil {
 		return err
 	}
@@ -935,13 +935,13 @@ func loadWords(ctx context.Context, s cadata.Getter, ref Ref, ws []Word) error {
 	return nil
 }
 
-func postWords(ctx context.Context, s cadata.Poster, salt *Ref, size int, ws []Word) (Ref, error) {
+func postWords(ctx context.Context, s core.WO, salt *Ref, size int, ws []Word) (Ref, error) {
 	buf := make([]byte, len(ws)*WordBits/8)
 	wordsToBytes(ws, buf)
 
-	var saltCID *cadata.ID
+	var saltCID *core.CID
 	if salt != nil {
-		saltCID = new(cadata.ID)
+		saltCID = new(core.CID)
 		*saltCID = salt.CID()
 	}
 	cid, err := s.Post(ctx, saltCID, buf[:divCeil(size, 8)])

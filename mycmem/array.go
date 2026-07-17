@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 	"reflect"
 	"strings"
 
 	"go.brendoncarroll.net/exp/slices2"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -65,7 +65,7 @@ func (at *ArrayType) Zero() Value {
 	return NewArray(elem, vals...)
 }
 
-func (at *ArrayType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (at *ArrayType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return at.elemAT.PullInto(ctx, dst, src)
 }
 
@@ -165,7 +165,7 @@ func (a *Array) String() string {
 	return sb.String()
 }
 
-func (a *Array) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (a *Array) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return pullIntoBatch(ctx, dst, src, a.vs...)
 }
 

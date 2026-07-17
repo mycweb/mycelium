@@ -48,10 +48,10 @@ type QUICTransport struct {
 	quic       quic.Transport
 
 	mu    sync.RWMutex
-	conns map[connKey]quic.Connection
+	conns map[connKey]*quic.Conn
 
-	dialSF   singleflight.Group[connKey, quic.Connection]
-	toHandle chan quic.Connection
+	dialSF   singleflight.Group[connKey, *quic.Conn]
+	toHandle chan *quic.Conn
 }
 
 func NewQUIC(privateKey sign.PrivateKey, pconn net.PacketConn) *QUICTransport {
@@ -62,8 +62,8 @@ func NewQUIC(privateKey sign.PrivateKey, pconn net.PacketConn) *QUICTransport {
 			Conn: pconn,
 		},
 
-		conns:    make(map[connKey]quic.Connection),
-		toHandle: make(chan quic.Connection),
+		conns:    make(map[connKey]*quic.Conn),
+		toHandle: make(chan *quic.Conn),
 	}
 }
 
@@ -128,7 +128,7 @@ func (qt *QUICTransport) LocalAddr() QUICAddr {
 }
 
 // getConn returns a connection to the specified peer
-func (qt *QUICTransport) getConn(ctx context.Context, raddr QUICAddr) (quic.Connection, error) {
+func (qt *QUICTransport) getConn(ctx context.Context, raddr QUICAddr) (*quic.Conn, error) {
 	k := mkConnKey(raddr)
 	qt.mu.RLock()
 	conn := qt.conns[k]
@@ -136,7 +136,7 @@ func (qt *QUICTransport) getConn(ctx context.Context, raddr QUICAddr) (quic.Conn
 	if conn != nil {
 		return conn, nil
 	}
-	conn, err, _ := qt.dialSF.Do(k, func() (quic.Connection, error) {
+	conn, err, _ := qt.dialSF.Do(k, func() (*quic.Conn, error) {
 		// check if there is a conn again.
 		qt.mu.RLock()
 		conn := qt.conns[k]
@@ -170,7 +170,7 @@ func (qt *QUICTransport) getConn(ctx context.Context, raddr QUICAddr) (quic.Conn
 
 // dialConn dials a new quic connection and returns it.
 // It does not modify peers or take any locks.
-func (qt *QUICTransport) dialConn(ctx context.Context, raddr QUICAddr) (quic.Connection, error) {
+func (qt *QUICTransport) dialConn(ctx context.Context, raddr QUICAddr) (*quic.Conn, error) {
 	conn, err := qt.quic.Dial(ctx, net.UDPAddrFromAddrPort(raddr.Location), qt.makeDialTlsConfig(raddr.Peer.ID()), qt.makeQuicConfig())
 	if err != nil {
 		return nil, err
@@ -228,7 +228,7 @@ func (qt *QUICTransport) Serve(ctx context.Context, h QUICHandler) error {
 	return eg.Wait()
 }
 
-func (qt *QUICTransport) handleConn(ctx context.Context, conn quic.Connection, h QUICHandler) error {
+func (qt *QUICTransport) handleConn(ctx context.Context, conn *quic.Conn, h QUICHandler) error {
 	defer conn.CloseWithError(0, "deferred close")
 	peer, err := peerFromTLSState(conn.ConnectionState().TLS)
 	if err != nil {
@@ -273,7 +273,7 @@ func (qt *QUICTransport) handleConn(ctx context.Context, conn quic.Connection, h
 	return eg.Wait()
 }
 
-func (qt *QUICTransport) handleStream(ctx context.Context, raddr QUICAddr, s quic.Stream, h QUICHandler) error {
+func (qt *QUICTransport) handleStream(ctx context.Context, raddr QUICAddr, s *quic.Stream, h QUICHandler) error {
 	defer s.Close()
 	var req Message
 	if _, err := req.ReadFrom(s); err != nil {
@@ -290,7 +290,7 @@ func (qt *QUICTransport) handleStream(ctx context.Context, raddr QUICAddr, s qui
 	return err
 }
 
-func (qt *QUICTransport) handleUniStream(ctx context.Context, raddr QUICAddr, s quic.ReceiveStream, h QUICHandler) error {
+func (qt *QUICTransport) handleUniStream(ctx context.Context, raddr QUICAddr, s *quic.ReceiveStream, h QUICHandler) error {
 	var msg Message
 	if _, err := msg.ReadFrom(s); err != nil {
 		return err
@@ -361,7 +361,7 @@ func peerFromTLSState(tlsState tls.ConnectionState) (*Peer, error) {
 	}
 }
 
-func locationFromConn(x quic.Connection) netip.AddrPort {
+func locationFromConn(x *quic.Conn) netip.AddrPort {
 	udpAddr := x.RemoteAddr().(*net.UDPAddr)
 	return udpAddr.AddrPort()
 }

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"iter"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"blobcache.io/blobcache/src/bcsdk"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -15,7 +16,7 @@ func (et AnyProgType) Type() Type {
 	return AnyProgKind()
 }
 
-func (et AnyProgType) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (et AnyProgType) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 
@@ -67,8 +68,8 @@ func (e *AnyProg) Type() Type {
 	return AnyProgType{}
 }
 
-func (e *AnyProg) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
-	if yes, err := dst.Exists(ctx, &e.ref.cid); err != nil {
+func (e *AnyProg) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
+	if yes, err := bcsdk.ExistsUnit(ctx, dst, e.ref.cid); err != nil {
 		return err
 	} else if yes {
 		return nil

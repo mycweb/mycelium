@@ -6,9 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"blobcache.io/blobcache/src/blobcache"
 	"myceliumweb.org/mycelium/spore/ast"
-
-	"myceliumweb.org/mycelium/internal/cadata"
 )
 
 type AST = ast.Node
@@ -129,7 +128,7 @@ func (p Printer) printExpr(w Writer, e AST) error {
 		_, err := fmt.Fprintf(w, "%s", e)
 		return err
 	case ast.Ref:
-		enc := base64.NewEncoding(cadata.Base64Alphabet)
+		enc := base64.NewEncoding(blobcache.Base64Alphabet)
 		_, err := w.WriteString(enc.EncodeToString(e[:]))
 		return err
 	case ast.Param:

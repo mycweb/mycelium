@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 
 	"go.brendoncarroll.net/exp/slices2"
@@ -187,7 +187,7 @@ func (t *Kind) TypeCode() spec.TypeCode {
 	return t.class
 }
 
-func (k *Kind) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (k *Kind) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -48,7 +48,7 @@ func (t *LazyType) Components() iter.Seq[Value] {
 	}
 }
 
-func (lt *LazyType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (lt *LazyType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return lt.elemAT.PullInto(ctx, dst, src)
 }
 
@@ -106,7 +106,7 @@ func (l *Lazy) Components() iter.Seq[Value] {
 	}
 }
 
-func (la *Lazy) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (la *Lazy) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return la.body.PullInto(ctx, dst, src)
 }
 

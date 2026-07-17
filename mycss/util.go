@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/internal/testutil"
 	"myceliumweb.org/mycelium/myccanon"
@@ -55,7 +54,7 @@ func NewTestSys(t testing.TB) *System {
 }
 
 // Eval spawns a new Process to evaluate the expr.
-func Eval(ctx context.Context, p *Pod, dst cadata.PostExister, src cadata.GetExister, fn func(env myc.Value) *myc.Lazy) (myc.Value, error) {
+func Eval(ctx context.Context, p *Pod, dst mycelium.WO, src mycelium.RO, fn func(env myc.Value) *myc.Lazy) (myc.Value, error) {
 	var out myc.Value
 	if err := p.DoInProcess(ctx, func(pc ProcCtx) error {
 		laz := fn(pc.NS().ToMycelium())

@@ -8,14 +8,14 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/spec"
 )
 
 type Ref [spec.RefBits / 8]byte
 
-func (r *Ref) CID() cadata.ID {
-	return cadata.ID(r[:])
+func (r *Ref) CID() mycelium.CID {
+	return mycelium.CID(r[:])
 }
 
 type Expr [spec.ExprBits / 8]byte
@@ -74,9 +74,9 @@ func (av *AnyValue) GetRef() Ref {
 	return Ref(av[spec.AnyTypeBits/8:])
 }
 
-func Load(ctx context.Context, s cadata.Getter, ref Ref, dst []byte) error {
+func Load(ctx context.Context, s mycelium.RO, ref Ref, dst []byte) error {
 	cid := ref.CID()
-	n, err := s.Get(ctx, &cid, nil, dst)
+	n, err := s.Get(ctx, cid, nil, dst)
 	if err != nil {
 		return err
 	}

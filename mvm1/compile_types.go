@@ -6,8 +6,6 @@ import (
 	"math/bits"
 
 	"myceliumweb.org/mycelium"
-
-	"myceliumweb.org/mycelium/internal/cadata"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 )
@@ -313,7 +311,7 @@ func (c *Compiler) distinctType(ctx context.Context, base AnyType, mark AnyValue
 	ws = append(ws, mark[:]...)
 	buf := make([]byte, len(ws)*WordBits/8)
 
-	var salt cadata.ID
+	var salt mycelium.CID
 	cid, err := c.store.Post(ctx, &salt, buf)
 	if err != nil {
 		return Type{}, err
@@ -378,7 +376,7 @@ func (c *Compiler) expandFractalType(ctx context.Context, ft FractalType) (Type,
 }
 
 // SizeOf returns the Size of a type passed inside an AnyType
-func SizeOf(ctx context.Context, s cadata.Getter, x AnyType) (int, error) {
+func SizeOf(ctx context.Context, s mycelium.RO, x AnyType) (int, error) {
 	kc := x.GetType().TypeCode()
 	switch kc {
 	case spec.TC_Kind:
@@ -476,7 +474,7 @@ func SizeOf(ctx context.Context, s cadata.Getter, x AnyType) (int, error) {
 }
 
 // NeedsSalt returns true if values of type ty need a salt when posting
-func NeedsSalt(ctx context.Context, s cadata.Getter, x AnyType) (bool, error) {
+func NeedsSalt(ctx context.Context, s mycelium.RO, x AnyType) (bool, error) {
 	kc := x.GetType().TypeCode()
 	switch kc {
 	case spec.TC_Kind:
@@ -539,7 +537,7 @@ func NeedsSalt(ctx context.Context, s cadata.Getter, x AnyType) (bool, error) {
 	}
 }
 
-func sumTagOffset(ctx context.Context, s cadata.Store, st SumType) (ret int, _ error) {
+func sumTagOffset(ctx context.Context, s mycelium.RW, st SumType) (ret int, _ error) {
 	for i := 0; i < st.Len(); i++ {
 		size, err := SizeOf(ctx, s, st.At(i))
 		if err != nil {
@@ -551,7 +549,7 @@ func sumTagOffset(ctx context.Context, s cadata.Store, st SumType) (ret int, _ e
 }
 
 // productOffsets calculates the offsets in bits for each member of the product
-func productOffsets(ctx context.Context, s cadata.Store, pt ProductType) ([]int, error) {
+func productOffsets(ctx context.Context, s mycelium.RW, pt ProductType) ([]int, error) {
 	var acc int
 	ret := make([]int, pt.Len())
 	for i := range ret {

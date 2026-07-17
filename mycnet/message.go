@@ -9,7 +9,6 @@ import (
 	"net"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	myc "myceliumweb.org/mycelium/mycmem"
 )
 
@@ -65,7 +64,7 @@ func (m *Message) WriteTo(w io.Writer) (int64, error) {
 	return vec.WriteTo(w)
 }
 
-func (m *Message) SetBlobPull(id cadata.ID) {
+func (m *Message) SetBlobPull(id mycelium.CID) {
 	m.setType(MT_BLOB_PULL)
 	m.setBody(id[:])
 }
@@ -75,7 +74,7 @@ func (m *Message) SetBlobPush(x []byte) {
 	m.setBody(x)
 }
 
-func (m *Message) SetBlobNotFound(id cadata.ID) {
+func (m *Message) SetBlobNotFound(id mycelium.CID) {
 	m.setType(MT_BLOB_PUSH)
 	m.setBody(id[:])
 }
@@ -95,7 +94,7 @@ func (m *Message) SetAnyValReply(data []byte) {
 	m.setBody(data)
 }
 
-func (m *Message) AsAnyValue(ctx context.Context, src cadata.Getter) (*myc.AnyValue, error) {
+func (m *Message) AsAnyValue(ctx context.Context, src mycelium.RO) (*myc.AnyValue, error) {
 	switch m.Type() {
 	case MT_ANYVAL_TELL, MT_ANYVAL_ASK, MT_ANYVAL_REPLY:
 		return myc.LoadRoot(ctx, src, m.Body())
@@ -104,12 +103,14 @@ func (m *Message) AsAnyValue(ctx context.Context, src cadata.Getter) (*myc.AnyVa
 	}
 }
 
-func (m *Message) AsID() (cadata.ID, error) {
+func (m *Message) AsID() (mycelium.CID, error) {
 	body := m.Body()
-	if len(body) != cadata.IDSize {
-		return cadata.ID{}, fmt.Errorf("message is wrong size to be ID, len=%d", len(body))
+	if len(body) != len(mycelium.CID{}) {
+		return mycelium.CID{}, fmt.Errorf("message is wrong size to be ID, len=%d", len(body))
 	}
-	return cadata.IDFromBytes(body), nil
+	var id mycelium.CID
+	copy(id[:], body)
+	return id, nil
 }
 
 func (m *Message) String() string {

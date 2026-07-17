@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -36,7 +36,7 @@ type MacroFunc = func(x ast.SExpr) (ast.Node, error)
 type BuiltInFunc = func(ctx context.Context, eb EB, loc Loc, scope *Scope, args ast.SExpr) (*Expr, error)
 
 type Compiler struct {
-	s         cadata.Store
+	s         mycelium.RW
 	rootScope Scope
 
 	vm       *mvm1.VM
@@ -45,7 +45,7 @@ type Compiler struct {
 	prims    map[ast.Op]spec.Op
 }
 
-func New(s cadata.Store, preamble map[string]*Expr) Compiler {
+func New(s mycelium.RW, preamble map[string]*Expr) Compiler {
 	c := Compiler{
 		s: s,
 		rootScope: Scope{
@@ -726,7 +726,7 @@ func filterComments(e []ast.Node) []ast.Node {
 	})
 }
 
-func eval[T myc.Value](ctx context.Context, s cadata.Store, vm *mvm1.VM, x *Expr) (ret T, _ error) {
+func eval[T myc.Value](ctx context.Context, s mycelium.RW, vm *mvm1.VM, x *Expr) (ret T, _ error) {
 	vm.Reset()
 	laz, err := mycexpr.BuildLazy(myc.AnyValueType{}, func(eb EB) *Expr {
 		return eb.AnyValueFrom(x)

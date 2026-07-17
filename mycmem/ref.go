@@ -9,10 +9,10 @@ import (
 	"slices"
 	"sync"
 
+	"blobcache.io/blobcache/src/bcsdk"
+	"blobcache.io/blobcache/src/blobcache"
 	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
-	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -64,7 +64,7 @@ func (t *RefType) String() string {
 	return fmt.Sprintf("Ref[%v]", t.elem)
 }
 
-func (rt *RefType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (rt *RefType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return NewAnyType(rt.elem).PullInto(ctx, dst, src)
 }
 
@@ -94,7 +94,7 @@ func (rt *RefType) Components() iter.Seq[Value] {
 
 type Ref struct {
 	elem Type
-	cid  cadata.ID
+	cid  mycelium.CID
 }
 
 func NewRef(elem Type, data [32]byte) *Ref {
@@ -103,7 +103,7 @@ func NewRef(elem Type, data [32]byte) *Ref {
 	}
 	return &Ref{
 		elem: elem,
-		cid:  cadata.ID(data[:32]),
+		cid:  mycelium.CID(data[:32]),
 	}
 }
 
@@ -137,8 +137,8 @@ func (r Ref) String() string {
 	return fmt.Sprintf("@%s", enc.EncodeToString(r.Bytes()))
 }
 
-func (r *Ref) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
-	if yes, err := dst.Exists(ctx, &r.cid); err != nil {
+func (r *Ref) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
+	if yes, err := bcsdk.ExistsUnit(ctx, dst, r.cid); err != nil {
 		return err
 	} else if yes {
 		// This is where we avoid repeated work.
@@ -171,7 +171,7 @@ func (r *Ref) Components() iter.Seq[Value] {
 }
 
 func Base64Encoding() *base64.Encoding {
-	return base64.NewEncoding(cadata.Base64Alphabet).WithPadding(base64.NoPadding)
+	return base64.NewEncoding(blobcache.Base64Alphabet).WithPadding(base64.NoPadding)
 }
 
 // listRefs returns all the references contained in Value.
@@ -192,7 +192,7 @@ func forEachRef(v Value, fn func(ref *Ref) error) error {
 	return nil
 }
 
-func pullIntoBatch(ctx context.Context, dst cadata.PostExister, src cadata.Getter, vals ...Value) error {
+func pullIntoBatch(ctx context.Context, dst mycelium.WO, src mycelium.RO, vals ...Value) error {
 	for _, val := range vals {
 		if err := val.PullInto(ctx, dst, src); err != nil {
 			return err
@@ -201,22 +201,40 @@ func pullIntoBatch(ctx context.Context, dst cadata.PostExister, src cadata.Gette
 	return nil
 }
 
+type emptyRO struct{}
+
+func (emptyRO) Get(context.Context, mycelium.CID, *mycelium.CID, []byte) (int, error) {
+	return 0, blobcache.ErrNotFound{}
+}
+
+func (emptyRO) Exists(context.Context, []mycelium.CID, *blobcache.BitMap) error {
+	return nil
+}
+
+func (emptyRO) KeyedHash(salt *mycelium.CID, data []byte) mycelium.CID {
+	return mycelium.Hash(salt, data)
+}
+
+type getter interface {
+	Get(ctx context.Context, cid mycelium.CID, salt *mycelium.CID, buf []byte) (int, error)
+}
+
 // Post marshals v, and adds it to the store.
 // If v contains Refs, post checks that they exist, before adding v.
 // If ty == nil, then v.Type() is assumed as a default.
 // The returned Ref will always have ty as an element type if ty != nil
-func Post(ctx context.Context, s cadata.PostExister, v Value) (Ref, error) {
+func Post(ctx context.Context, s mycelium.WO, v Value) (Ref, error) {
 	cid := ContentID(v)
-	if exists, err := s.Exists(ctx, &cid); err == nil && exists {
+	if exists, err := bcsdk.ExistsUnit(ctx, s, cid); err == nil && exists {
 		return *NewRef(v.Type(), cid), nil
 	}
-	if err := v.PullInto(ctx, s, stores.Union{}); err != nil {
+	if err := v.PullInto(ctx, s, emptyRO{}); err != nil {
 		return Ref{}, err
 	}
 
 	// check that all the deps exist.
 	if err := forEachRef(v, func(ref *Ref) error {
-		if exists, err := s.Exists(ctx, &ref.cid); err != nil {
+		if exists, err := bcsdk.ExistsUnit(ctx, s, ref.cid); err != nil {
 			return err
 		} else if !exists && !reflect.DeepEqual(v, ref) {
 			return ErrDanglingRef{Value: v, Ref: ref}
@@ -246,7 +264,7 @@ func Post(ctx context.Context, s cadata.PostExister, v Value) (Ref, error) {
 }
 
 // Load loads a Mycelium value from storage.
-func Load(ctx context.Context, src cadata.Getter, ref Ref) (Value, error) {
+func Load(ctx context.Context, src getter, ref Ref) (Value, error) {
 	ty := ref.ElemType()
 	if tt, ok := ty.(*FractalType); ok {
 		ty = tt.expanded
@@ -254,7 +272,7 @@ func Load(ctx context.Context, src cadata.Getter, ref Ref) (Value, error) {
 	salt := saltForValueOfType(ty)
 	buf := acquireBuffer()
 	defer releaseBuffer(buf)
-	n, err := src.Get(ctx, &ref.cid, salt, buf[:])
+	n, err := src.Get(ctx, ref.cid, salt, buf[:])
 	if err != nil {
 		return nil, err
 	}
@@ -277,14 +295,14 @@ func Load(ctx context.Context, src cadata.Getter, ref Ref) (Value, error) {
 // Values that only contain bits may have the same ContentID even if they are different types.
 // This is to improve convergence and deduplication.
 // ContentID will always match the value returned by Post
-func ContentID(x Value) cadata.ID {
+func ContentID(x Value) mycelium.CID {
 	bb := bitbuf.New(int(x.Type().SizeOf()))
 	x.Encode(bb)
 	salt := saltForValueOfType(x.Type())
 	return mycelium.Hash(salt, bb.Bytes())
 }
 
-func saltForValueOfType(x Type) *cadata.ID {
+func saltForValueOfType(x Type) *mycelium.CID {
 	if !requiresSalt(x) {
 		return nil
 	}

@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"myceliumweb.org/mycelium"
 	myc "myceliumweb.org/mycelium/mycmem"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/testutil"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -229,6 +229,6 @@ func mkLambda(in, out myc.Type, body func(eb EB) *Expr) *myc.Lambda {
 	return la
 }
 
-func newVM(s cadata.Store) *mvm1.VM {
+func newVM(s mycelium.RW) *mvm1.VM {
 	return mvm1.New(0, s, mvm1.DefaultAccels())
 }

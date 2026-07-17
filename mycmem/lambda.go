@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -57,7 +57,7 @@ func (lpt *LambdaType) Components() iter.Seq[Value] {
 	}
 }
 
-func (lt *LambdaType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (lt *LambdaType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return pullIntoBatch(ctx, dst, src, lt.inAT, lt.outAT)
 }
 
@@ -113,7 +113,7 @@ func (la *Lambda) Type() Type {
 	return la.LambdaType()
 }
 
-func (la *Lambda) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (la *Lambda) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return la.body.PullInto(ctx, dst, src)
 }
 

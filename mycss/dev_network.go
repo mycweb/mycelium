@@ -16,7 +16,6 @@ import (
 
 	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/mycbytes"
@@ -116,7 +115,7 @@ type nodeDev struct {
 	incomingTells chan myc.Product
 }
 
-func newNetworkNode(bgCtx context.Context, s cadata.Store, loc *AddressBook, secret *[32]byte, i uint32) (*nodeDev, error) {
+func newNetworkNode(bgCtx context.Context, s mycelium.RW, loc *AddressBook, secret *[32]byte, i uint32) (*nodeDev, error) {
 	_, privKey, err := deriveEd25519(secret, uint64(i))
 	if err != nil {
 		return nil, err
@@ -170,7 +169,7 @@ func (sv *nodeDev) stop() {
 	sv.cf()
 }
 
-func (svc *nodeDev) tell(ctx context.Context, s cadata.Getter, msg myc.Product) (myc.Value, error) {
+func (svc *nodeDev) tell(ctx context.Context, s mycelium.RO, msg myc.Product) (myc.Value, error) {
 	raddr, err := addrFrom(msg[0])
 	if err != nil {
 		return nil, err
@@ -189,7 +188,7 @@ func (svc *nodeDev) tell(ctx context.Context, s cadata.Getter, msg myc.Product) 
 	return myc.Product{}, nil
 }
 
-func (svc *nodeDev) recv(ctx context.Context, _ cadata.PostExister, _ myc.Product) (myc.Product, error) {
+func (svc *nodeDev) recv(ctx context.Context, _ mycelium.WO, _ myc.Product) (myc.Product, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
@@ -219,7 +218,7 @@ func (svc *nodeDev) verify(ctx context.Context, x myc.Product) (*myc.Bit, error)
 	return myc.NewBit(1), nil
 }
 
-func (svc *nodeDev) portInput(ctx context.Context, dst cadata.PostExister, buf []mvm1.Word) error {
+func (svc *nodeDev) portInput(ctx context.Context, dst mycelium.WO, buf []mvm1.Word) error {
 	laddr := addrTo(svc.qt.LocalAddr())
 	if err := laddr.PullInto(ctx, dst, stores.Union{}); err != nil {
 		return fmt.Errorf("portInput %w", err)
@@ -231,7 +230,7 @@ func (svc *nodeDev) portInput(ctx context.Context, dst cadata.PostExister, buf [
 	return bytesToWords(data, buf)
 }
 
-func (svc *nodeDev) portInteract(ctx context.Context, s cadata.Store, buf []mvm1.Word) error {
+func (svc *nodeDev) portInteract(ctx context.Context, s mycelium.RW, buf []mvm1.Word) error {
 	req := DEV_NET_NodeReq.Zero().(*myc.Sum)
 	data := wordsToBytes(buf)
 	load := func(ref myc.Ref) (myc.Value, error) {

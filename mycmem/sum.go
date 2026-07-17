@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 	"strings"
 
 	"go.brendoncarroll.net/exp/slices2"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -40,7 +40,7 @@ func (st SumType) Zero() Value {
 	return &Sum{ty: st, tag: 0, val: st[0].Zero()}
 }
 
-func (st SumType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (st SumType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	for _, ty := range st {
 		at := NewAnyType(ty)
 		if err := at.PullInto(ctx, dst, src); err != nil {
@@ -132,7 +132,7 @@ func (st SumType) New(tag int, v Value) (*Sum, error) {
 	return &Sum{ty: st, tag: tag, val: v}, nil
 }
 
-func (sum Sum) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (sum Sum) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return sum.val.PullInto(ctx, dst, src)
 }
 

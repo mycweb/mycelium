@@ -7,10 +7,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"blobcache.io/blobcache/src/blobcache"
 )
 
-const Base64Alphabet = cadata.Base64Alphabet
+const Base64Alphabet = blobcache.Base64Alphabet
 
 type stateFunc func() stateFunc
 

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"blobcache.io/blobcache/src/blobcache"
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/mycbytes"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -86,9 +86,9 @@ type client[T comparable] struct {
 	tp Transport[T]
 }
 
-func (c client[T]) blobPull(ctx context.Context, dst Addr[T], id *cadata.ID, salt *cadata.ID, buf []byte) (int, error) {
+func (c client[T]) blobPull(ctx context.Context, dst Addr[T], id mycelium.CID, salt *mycelium.CID, buf []byte) (int, error) {
 	var req, resp Message
-	req.SetBlobPull(*id)
+	req.SetBlobPull(id)
 	if err := c.tp.Ask(ctx, dst, &req, &resp); err != nil {
 		return 0, err
 	}
@@ -96,10 +96,13 @@ func (c client[T]) blobPull(ctx context.Context, dst Addr[T], id *cadata.ID, sal
 		return 0, fmt.Errorf("response to blob pull must be blob push. HAVE: %v", resp.Type())
 	}
 	if bytes.HasPrefix(resp.Body(), id[:]) {
-		return 0, cadata.ErrNotFound{Key: id}
+		return 0, blobcache.ErrNotFound{CID: id}
 	}
-	if err := cadata.Check(mycelium.Hash, id, salt, resp.Body()); err != nil {
-		return 0, err
+	if have := mycelium.Hash(salt, resp.Body()); have != id {
+		return 0, fmt.Errorf("blob pull hash mismatch HAVE: %v WANT: %v", have, id)
+	}
+	if len(resp.Body()) > len(buf) {
+		return 0, fmt.Errorf("buffer too small for blob")
 	}
 	return copy(buf[:], resp.Body()), nil
 }
@@ -123,7 +126,7 @@ func (c client[T]) askAnyVal(ctx context.Context, dst Addr[T], av mycbytes.AnyVa
 	return &ret, nil
 }
 
-func (c client[T]) RemoteStore(raddr Addr[T]) cadata.Getter {
+func (c client[T]) RemoteStore(raddr Addr[T]) mycelium.RO {
 	return &remoteStore[T]{raddr: raddr, tp: c.tp}
 }
 
@@ -165,8 +168,8 @@ func (s *server[T]) handleAsk(ctx context.Context, from Addr[T], req, resp *Mess
 		}
 		resp.setType(MT_BLOB_PUSH)
 		store := s.repo.Open(from.Peer.ID())
-		n, err := store.Get(ctx, &id, nil, resp.MaxBuf())
-		if errors.As(err, &cadata.ErrNotFound{}) {
+		n, err := store.Get(ctx, id, nil, resp.MaxBuf())
+		if errors.As(err, &blobcache.ErrNotFound{}) {
 			resp.SetBlobNotFound(id)
 			return nil
 		} else if err != nil {
@@ -193,18 +196,30 @@ func (s *server[T]) handleAsk(ctx context.Context, from Addr[T], req, resp *Mess
 	}
 }
 
-// RemoteStore implements a cadata.Getter using the BlobPull/Push protocol messages.
+// RemoteStore implements a mycelium.RO using the BlobPull/Push protocol messages.
 type remoteStore[T comparable] struct {
 	tp    Transport[T]
 	raddr Addr[T]
 }
 
-func (s *remoteStore[T]) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []byte) (int, error) {
+func (s *remoteStore[T]) Get(ctx context.Context, id mycelium.CID, salt *mycelium.CID, buf []byte) (int, error) {
 	c := client[T]{tp: s.tp}
 	return c.blobPull(ctx, s.raddr, id, salt, buf)
 }
 
-func (s *remoteStore[T]) Hash(salt *cadata.ID, x []byte) cadata.ID {
+func (s *remoteStore[T]) Exists(ctx context.Context, cids []mycelium.CID, bm *blobcache.BitMap) error {
+	tmp := make([]byte, mycelium.MaxSizeBytes)
+	for i, cid := range cids {
+		if _, err := s.Get(ctx, cid, nil, tmp); err == nil {
+			bm.Set(i)
+		} else if !errors.As(err, &blobcache.ErrNotFound{}) {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *remoteStore[T]) KeyedHash(salt *mycelium.CID, x []byte) mycelium.CID {
 	return mycelium.Hash(salt, x)
 }
 
@@ -214,7 +229,7 @@ func (s *remoteStore[T]) MaxSize() int {
 
 // repo stores artifacts
 type repo struct {
-	s cadata.Store
+	s mycelium.RW
 }
 
 func newRepo() *repo {
@@ -235,6 +250,6 @@ func (r *repo) Pin(x Artifact) func() {
 	return func() {}
 }
 
-func (r *repo) Open(peer PeerID) cadata.Getter {
+func (r *repo) Open(peer PeerID) mycelium.RO {
 	return r.s
 }

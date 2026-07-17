@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
+	"blobcache.io/blobcache/src/bcsdk"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -35,10 +36,10 @@ func (AnyValueType) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (AnyValueType) PullInto(context.Context, cadata.PostExister, cadata.Getter) error { return nil }
-func (AnyValueType) Encode(BitBuf)                                                     {}
-func (AnyValueType) Decode(BitBuf, LoadFunc) error                                     { return nil }
-func (AnyValueType) Zero() Value                                                       { return NewAnyValue(KindKind()) }
+func (AnyValueType) PullInto(context.Context, mycelium.WO, mycelium.RO) error { return nil }
+func (AnyValueType) Encode(BitBuf)                                            {}
+func (AnyValueType) Decode(BitBuf, LoadFunc) error                            { return nil }
+func (AnyValueType) Zero() Value                                              { return NewAnyValue(KindKind()) }
 
 type AnyValue struct {
 	x Value
@@ -108,11 +109,11 @@ func (av *AnyValue) Decode(bb bitbuf.Buf, load LoadFunc) error {
 	return nil
 }
 
-func (av *AnyValue) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (av *AnyValue) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	if err := av.at.PullInto(ctx, dst, src); err != nil {
 		return err
 	}
-	if yes, err := dst.Exists(ctx, &av.valRef.cid); err != nil {
+	if yes, err := bcsdk.ExistsUnit(ctx, dst, av.valRef.cid); err != nil {
 		return err
 	} else if yes {
 		return nil

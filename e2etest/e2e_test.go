@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/testutil"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -82,14 +82,14 @@ func newSide(t testing.TB) side {
 	}
 }
 
-func reset(t testing.TB, pod *mycss.Pod, src cadata.Getter, ns myccanon.Namespace, cfg mycss.PodConfig) {
+func reset(t testing.TB, pod *mycss.Pod, src mycelium.RO, ns myccanon.Namespace, cfg mycss.PodConfig) {
 	t.Helper()
 	ctx := testutil.Context(t)
 	err := pod.Reset(ctx, src, ns, cfg)
 	require.NoError(t, err)
 }
 
-func eval(t testing.TB, pod *mycss.Pod, s cadata.Store, v *mycexpr.Expr) myc.Value {
+func eval(t testing.TB, pod *mycss.Pod, s mycelium.RW, v *mycexpr.Expr) myc.Value {
 	t.Helper()
 	ctx, cf := context.WithTimeoutCause(testutil.Context(t), 3*time.Second, errors.New("eval took too long"))
 	defer cf()
@@ -107,7 +107,7 @@ func eval(t testing.TB, pod *mycss.Pod, s cadata.Store, v *mycexpr.Expr) myc.Val
 type side struct {
 	sys *mycss.System
 	// store can be used as scratch space for loading and retrieving values from the pod.
-	store cadata.Store
+	store mycelium.RW
 }
 
 func (s *side) createPod(t testing.TB) *mycss.Pod {

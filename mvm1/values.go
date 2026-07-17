@@ -8,7 +8,6 @@ import (
 
 	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 )
@@ -99,7 +98,7 @@ func (av *AnyValue) SetType(at AnyType) {
 // Ref refers to a Value in the store
 type Ref [RefBits / WordBits]Word
 
-func RefFromCID(cid cadata.ID) (r Ref) {
+func RefFromCID(cid mycelium.CID) (r Ref) {
 	r.FromBytes(cid[:])
 	return r
 }
@@ -110,7 +109,7 @@ func (r *Ref) FromBytes(bs []byte) {
 	}
 }
 
-func (r Ref) CID() (ret cadata.ID) {
+func (r Ref) CID() (ret mycelium.CID) {
 	for i, w := range r {
 		binary.LittleEndian.PutUint32(ret[i*4:], w)
 	}
@@ -202,15 +201,15 @@ func (la *Lambda) Fingerprint(lty *LambdaType) Fingerprint {
 type Fingerprint [256 / WordBits]Word
 
 func (fp Fingerprint) String() string {
-	var cid cadata.ID
+	var cid mycelium.CID
 	wordsToBytes(fp[:], cid[:])
 	return cid.String()
 }
 
 func Hash(salt *Fingerprint, ws []Word, nbits int) Fingerprint {
-	var salt2 *cadata.ID
+	var salt2 *mycelium.CID
 	if salt != nil {
-		salt2 = new(cadata.ID)
+		salt2 = new(mycelium.CID)
 		wordsToBytes(salt[:], salt2[:])
 	}
 	data := make([]byte, len(ws)*WordBytes)
@@ -302,7 +301,7 @@ func (dv *dynValue) Lazy() Lazy {
 	return Lazy(dv.valData)
 }
 
-func (dv *dynValue) AsMycelium(ctx context.Context, s cadata.Getter) mycmem.Value {
+func (dv *dynValue) AsMycelium(ctx context.Context, s mycelium.RO) mycmem.Value {
 	load := func(ref mycmem.Ref) (mycmem.Value, error) {
 		return mycmem.Load(ctx, s, ref)
 	}

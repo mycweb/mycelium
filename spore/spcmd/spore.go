@@ -4,7 +4,6 @@ import (
 	"go.brendoncarroll.net/star"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/myccmd"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -77,6 +76,6 @@ var (
 	consoleParam = myccmd.ConsoleParam
 )
 
-func newMemStore() cadata.Store {
+func newMemStore() mycelium.RW {
 	return stores.NewMem(mycelium.Hash, mycelium.MaxSizeBytes)
 }

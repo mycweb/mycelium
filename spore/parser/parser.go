@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"blobcache.io/blobcache/src/blobcache"
 	"myceliumweb.org/mycelium/spore/ast"
 	"myceliumweb.org/mycelium/spore/lexer"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/ringbuf"
 )
 
@@ -214,7 +214,7 @@ func (p *Parser) parseOp(tok Token) (Span, Node, error) {
 
 func (p *Parser) parseRef(tok Token) (Span, Node, error) {
 	var ref [32]byte
-	enc := base64.NewEncoding(cadata.Base64Alphabet)
+	enc := base64.NewEncoding(blobcache.Base64Alphabet)
 	if _, err := enc.Decode(ref[:], []byte(tok.Text())[1:]); err != nil {
 		return Span{}, nil, err
 	}

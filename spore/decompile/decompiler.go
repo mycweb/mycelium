@@ -6,7 +6,7 @@ import (
 
 	"go.brendoncarroll.net/exp/slices2"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/mycexpr"
 	"myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
@@ -22,13 +22,13 @@ type (
 
 type Decompiler struct {
 	salt  *[32]byte
-	dict  map[cadata.ID]ast.Node
+	dict  map[mycelium.CID]ast.Node
 	prims map[spec.Op]ast.Op
 }
 
-func New(dict map[cadata.ID]ast.Node) *Decompiler {
+func New(dict map[mycelium.CID]ast.Node) *Decompiler {
 	if dict == nil {
-		dict = make(map[cadata.ID]ast.Node)
+		dict = make(map[mycelium.CID]ast.Node)
 	}
 	prims := make(map[spec.Op]ast.Op)
 	for name, code := range compile.Primitives() {

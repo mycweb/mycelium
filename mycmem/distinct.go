@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -64,7 +64,7 @@ func (dt *DistinctType) Make(x Value) Value {
 	return dt.MustNew(x)
 }
 
-func (dt *DistinctType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (dt *DistinctType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return pullIntoBatch(ctx, dst, src, NewAnyType(dt.base), NewAnyValue(dt.mark))
 }
 
@@ -122,7 +122,7 @@ func (d *Distinct) Unmake() Value {
 	return d.Unwrap()
 }
 
-func (d *Distinct) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (d *Distinct) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return d.val.PullInto(ctx, dst, src)
 }
 

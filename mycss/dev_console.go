@@ -5,8 +5,8 @@ import (
 	"io"
 	"sync"
 
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -38,7 +38,7 @@ func newConsoleSvc(out io.Writer) *consoleDev {
 	return &consoleDev{out: out}
 }
 
-func (c *consoleDev) output(ctx context.Context, s cadata.Getter, buf []mvm1.Word) error {
+func (c *consoleDev) output(ctx context.Context, s mycelium.RO, buf []mvm1.Word) error {
 	data := wordsToBytes(buf)
 	x := myc.StringType().Zero().(*myc.List)
 	load := func(ref myc.Ref) (myc.Value, error) {

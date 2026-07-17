@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/testutil"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -65,11 +65,11 @@ func lit(x myc.Value) *mycexpr.Expr {
 	return mycexpr.Literal(x)
 }
 
-func newVM(s cadata.Store) *mvm1.VM {
+func newVM(s mycelium.RW) *mvm1.VM {
 	return mvm1.New(0, s, mvm1.DefaultAccels())
 }
 
-func eval[T myc.Value](ctx context.Context, s cadata.Store, vm *mvm1.VM, x *mycexpr.Expr) (ret T, _ error) {
+func eval[T myc.Value](ctx context.Context, s mycelium.RW, vm *mvm1.VM, x *mycexpr.Expr) (ret T, _ error) {
 	vm.Reset()
 	laz, err := mycexpr.BuildLazy(myc.AnyValueType{}, func(eb mycexpr.EB) *mycexpr.Expr {
 		return eb.AnyValueFrom(x)

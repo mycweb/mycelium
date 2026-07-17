@@ -2,8 +2,8 @@ package myctests
 
 import (
 	"fmt"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mycexpr"
 	"myceliumweb.org/mycelium/mycmem"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -24,8 +24,8 @@ type EvalVec struct {
 }
 
 // EvalVecs returns test vectors for expression evaluation
-func EvalVecs(s cadata.PostExister) (out []EvalVec) {
-	for _, addVecs := range []func([]EvalVec, cadata.PostExister) []EvalVec{
+func EvalVecs(s mycelium.WO) (out []EvalVec) {
+	for _, addVecs := range []func([]EvalVec, mycelium.WO) []EvalVec{
 		literalEval,
 		bitEval,
 		letEval,
@@ -44,7 +44,7 @@ func EvalVecs(s cadata.PostExister) (out []EvalVec) {
 	return out
 }
 
-func literalEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func literalEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	for _, val := range InterestingValues(s) {
 		out = append(out, EvalVec{
 			I: lit(val),
@@ -54,7 +54,7 @@ func literalEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	return out
 }
 
-func letEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func letEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	vals := InterestingValues(s)
 	// make sure everything can be used in a let
@@ -119,7 +119,7 @@ func letEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func lambdaEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func lambdaEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	vals := InterestingValues(s)
 
@@ -181,7 +181,7 @@ func lambdaEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func uncraftEval(out []EvalVec, _ cadata.PostExister) []EvalVec {
+func uncraftEval(out []EvalVec, _ mycelium.WO) []EvalVec {
 	eb := EB{}
 	return append(out, []EvalVec{
 		{
@@ -220,7 +220,7 @@ func uncraftEval(out []EvalVec, _ cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func bitEval(out []EvalVec, _ cadata.PostExister) []EvalVec {
+func bitEval(out []EvalVec, _ mycelium.WO) []EvalVec {
 	out = append(out, []EvalVec{
 		{I: mkExpr(spec.ZERO), O: myc.NewBit(0)},
 		{I: mkExpr(spec.ONE), O: myc.NewBit(1)},
@@ -228,7 +228,7 @@ func bitEval(out []EvalVec, _ cadata.PostExister) []EvalVec {
 	return out
 }
 
-func typeOfEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func typeOfEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	type vec struct {
 		Name  string
@@ -288,7 +288,7 @@ func typeOfEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	return out
 }
 
-func sizeOfEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func sizeOfEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	type vec struct {
 		Size  int
 		Value myc.Value
@@ -311,7 +311,7 @@ func sizeOfEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	return out
 }
 
-func lenEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func lenEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	type vec struct {
 		Len   int
 		Value myc.Value
@@ -344,7 +344,7 @@ func lenEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	return out
 }
 
-func listEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func listEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	return append(out, []EvalVec{
 		{
@@ -377,7 +377,7 @@ func listEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func miscEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func miscEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	return append(out, []EvalVec{
 		{
@@ -437,7 +437,7 @@ func miscEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func codecEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func codecEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	return append(out, []EvalVec{
 		{

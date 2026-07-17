@@ -11,7 +11,6 @@ import (
 	"go.uber.org/zap"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 )
 
@@ -26,7 +25,7 @@ func Context(t testing.TB) context.Context {
 }
 
 func NewStore(t testing.TB) *stores.Mem {
-	return stores.NewMem(func(salt *cadata.ID, x []byte) (ret cadata.ID) {
+	return stores.NewMem(func(salt *mycelium.CID, x []byte) (ret mycelium.CID) {
 		return mycelium.Hash(salt, x)
 	}, 1<<21)
 }

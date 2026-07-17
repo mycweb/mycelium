@@ -4,12 +4,13 @@ import (
 	"archive/zip"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"sync"
 
+	"blobcache.io/blobcache/src/blobcache"
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	mycmem "myceliumweb.org/mycelium/mycmem"
 )
 
@@ -42,7 +43,7 @@ type File interface {
 }
 
 // LoadFromFile reads a Value from a File
-func LoadFromFile(ctx context.Context, f File) (mycmem.Value, cadata.Getter, error) {
+func LoadFromFile(ctx context.Context, f File) (mycmem.Value, mycelium.RO, error) {
 	finfo, err := f.Stat()
 	if err != nil {
 		return nil, nil, err
@@ -55,15 +56,14 @@ func LoadFromFile(ctx context.Context, f File) (mycmem.Value, cadata.Getter, err
 }
 
 var (
-	_ cadata.Getter  = &Store{}
-	_ cadata.Exister = &Store{}
+	_ mycelium.RO = &Store{}
 )
 
 type Store struct {
 	ZR *zip.Reader
 }
 
-func (s Store) Hash(tag *cadata.ID, data []byte) cadata.ID {
+func (s Store) KeyedHash(tag *mycelium.CID, data []byte) mycelium.CID {
 	return mycelium.Hash(tag, data)
 }
 
@@ -71,7 +71,7 @@ func (s Store) MaxSize() int {
 	return mycelium.MaxSizeBytes
 }
 
-func (s Store) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []byte) (int, error) {
+func (s Store) Get(ctx context.Context, id mycelium.CID, salt *mycelium.CID, buf []byte) (int, error) {
 	b64ID, err := id.MarshalBase64()
 	if err != nil {
 		return 0, err
@@ -79,7 +79,7 @@ func (s Store) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []by
 	f, err := s.ZR.Open(string(b64ID))
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return 0, cadata.ErrNotFound{Key: id}
+			return 0, blobcache.ErrNotFound{CID: id}
 		}
 		return 0, err
 	}
@@ -95,27 +95,33 @@ func (s Store) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []by
 			return 0, err
 		}
 	}
-	return n, cadata.Check(s.Hash, id, salt, buf[:n])
+	if have := s.KeyedHash(salt, buf[:n]); have != id {
+		return 0, fmt.Errorf("myczip: blob hash mismatch HAVE: %v WANT: %v", have, id)
+	}
+	return n, nil
 }
 
-func (s Store) Exists(ctx context.Context, id *cadata.ID) (bool, error) {
-	b64ID, err := id.MarshalBase64()
-	if err != nil {
-		return false, err
-	}
-	f, err := s.ZR.Open(string(b64ID))
-	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return false, nil
+func (s Store) Exists(ctx context.Context, ids []mycelium.CID, bm *blobcache.BitMap) error {
+	for i, id := range ids {
+		b64ID, err := id.MarshalBase64()
+		if err != nil {
+			return err
 		}
-		return false, err
+		f, err := s.ZR.Open(string(b64ID))
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				continue
+			}
+			return err
+		}
+		_ = f.Close()
+		bm.Set(i)
 	}
-	defer f.Close()
-	return true, nil
+	return nil
 }
 
 // Save adds all of the necessary content to the zip file and then sets the root.
-func Save(ctx context.Context, src cadata.Getter, v mycmem.Value, zw *zip.Writer) error {
+func Save(ctx context.Context, src mycelium.RO, v mycmem.Value, zw *zip.Writer) error {
 	dst := newWStore(zw)
 	if err := v.PullInto(ctx, dst, src); err != nil {
 		return err
@@ -139,7 +145,7 @@ func Save(ctx context.Context, src cadata.Getter, v mycmem.Value, zw *zip.Writer
 }
 
 // WriteTo creates a zip file wrapping w, calls Save, and then closes the zip file.
-func WriteTo(ctx context.Context, src cadata.Getter, v mycmem.Value, w io.Writer) error {
+func WriteTo(ctx context.Context, src mycelium.RO, v mycmem.Value, w io.Writer) error {
 	zw := zip.NewWriter(w)
 	if err := Save(ctx, src, v, zw); err != nil {
 		return err
@@ -147,20 +153,20 @@ func WriteTo(ctx context.Context, src cadata.Getter, v mycmem.Value, w io.Writer
 	return zw.Close()
 }
 
-var _ cadata.PostExister = &zipWStore{}
+var _ mycelium.WO = &zipWStore{}
 
 type zipWStore struct {
 	mu sync.Mutex
 	zw *zip.Writer
-	m  map[cadata.ID]struct{}
+	m  map[mycelium.CID]struct{}
 }
 
 func newWStore(zw *zip.Writer) *zipWStore {
-	return &zipWStore{zw: zw, m: make(map[cadata.ID]struct{})}
+	return &zipWStore{zw: zw, m: make(map[mycelium.CID]struct{})}
 }
 
-func (s *zipWStore) Post(ctx context.Context, tag *cadata.ID, data []byte) (cadata.ID, error) {
-	id := s.Hash(tag, data)
+func (s *zipWStore) Post(ctx context.Context, tag *mycelium.CID, data []byte) (mycelium.CID, error) {
+	id := s.KeyedHash(tag, data)
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -169,7 +175,7 @@ func (s *zipWStore) Post(ctx context.Context, tag *cadata.ID, data []byte) (cada
 	}
 	b64ID, err := id.MarshalBase64()
 	if err != nil {
-		return cadata.ID{}, err
+		return mycelium.CID{}, err
 	}
 	var extra []byte
 	if tag != nil {
@@ -182,23 +188,27 @@ func (s *zipWStore) Post(ctx context.Context, tag *cadata.ID, data []byte) (cada
 		Extra:              extra,
 	})
 	if err != nil {
-		return cadata.ID{}, err
+		return mycelium.CID{}, err
 	}
 	if _, err := w.Write(data); err != nil {
-		return cadata.ID{}, err
+		return mycelium.CID{}, err
 	}
 	s.m[id] = struct{}{}
 	return id, nil
 }
 
-func (s *zipWStore) Exists(ctx context.Context, id *cadata.ID) (bool, error) {
+func (s *zipWStore) Exists(ctx context.Context, ids []mycelium.CID, bm *blobcache.BitMap) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	_, exists := s.m[*id]
-	return exists, nil
+	for i, id := range ids {
+		if _, exists := s.m[id]; exists {
+			bm.Set(i)
+		}
+	}
+	return nil
 }
 
-func (s *zipWStore) Hash(tag *cadata.ID, data []byte) cadata.ID {
+func (s *zipWStore) KeyedHash(tag *mycelium.CID, data []byte) mycelium.CID {
 	return mycelium.Hash(tag, data)
 }
 

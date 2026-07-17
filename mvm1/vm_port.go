@@ -3,17 +3,16 @@ package mvm1
 import (
 	"context"
 	"fmt"
+	"myceliumweb.org/mycelium"
 	"slices"
 
 	"golang.org/x/exp/maps"
-
-	"myceliumweb.org/mycelium/internal/cadata"
 )
 
 type (
-	IOFunc     = func(ctx context.Context, s cadata.Store, buf []Word) error
-	InputFunc  = func(ctx context.Context, s cadata.PostExister, buf []Word) error
-	OutputFunc = func(ctx context.Context, s cadata.Getter, buf []Word) error
+	IOFunc     = func(ctx context.Context, s mycelium.RW, buf []Word) error
+	InputFunc  = func(ctx context.Context, s mycelium.WO, buf []Word) error
+	OutputFunc = func(ctx context.Context, s mycelium.RO, buf []Word) error
 )
 
 type PortBackend struct {

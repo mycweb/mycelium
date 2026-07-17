@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/testutil"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/myccanon/mycjson"
@@ -101,13 +101,13 @@ func newTestSys(t testing.TB) *System {
 	return NewSystem(db)
 }
 
-func reset(t testing.TB, pod *Pod, s cadata.Getter, ns myccanon.Namespace, cfg PodConfig) {
+func reset(t testing.TB, pod *Pod, s mycelium.RO, ns myccanon.Namespace, cfg PodConfig) {
 	ctx := testutil.Context(t)
 	err := pod.Reset(ctx, s, ns, cfg)
 	require.NoError(t, err)
 }
 
-func eval(t testing.TB, pod *Pod, s cadata.Store, fn func(eb mycexpr.EB) *mycexpr.Expr) myc.Value {
+func eval(t testing.TB, pod *Pod, s mycelium.RW, fn func(eb mycexpr.EB) *mycexpr.Expr) myc.Value {
 	ctx := testutil.Context(t)
 	out, err := Eval(ctx, pod, s, s, func(env myc.Value) *myc.Lazy {
 		laz, err := mycexpr.BuildLazy(myc.Bottom(), func(eb mycexpr.EB) *mycexpr.Expr {
@@ -120,7 +120,7 @@ func eval(t testing.TB, pod *Pod, s cadata.Store, fn func(eb mycexpr.EB) *mycexp
 	return out
 }
 
-func cellLoad(t testing.TB, pod *Pod, s cadata.Store, key string) myc.Value {
+func cellLoad(t testing.TB, pod *Pod, s mycelium.RW, key string) myc.Value {
 	return eval(t, pod, s, func(eb EB) *Expr {
 		return eb.Input(
 			GetCell(eb.P(0), key),
@@ -128,7 +128,7 @@ func cellLoad(t testing.TB, pod *Pod, s cadata.Store, key string) myc.Value {
 	}).(*myc.AnyValue).Unwrap()
 }
 
-func cellCAS(t testing.TB, pod *Pod, s cadata.Store, key string, prev, next myc.Value) myc.Value {
+func cellCAS(t testing.TB, pod *Pod, s mycelium.RW, key string, prev, next myc.Value) myc.Value {
 	return eval(t, pod, s, func(eb EB) *Expr {
 		return eb.Interact(
 			GetCell(eb.P(0), key),
