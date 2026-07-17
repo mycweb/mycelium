@@ -1,6 +1,6 @@
 package mvm2
 
-//go:generate zig build-lib -femit-bin=libmvm2zig.a src/root.zig
+//go:generate zig build-lib -femit-bin=libmvm2zig.a root.zig
 
 /*
 #cgo CFLAGS: -I${SRCDIR}
