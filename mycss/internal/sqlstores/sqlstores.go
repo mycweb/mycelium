@@ -156,31 +156,6 @@ func (s *txStore) Exists(ctx context.Context, ids []mycelium.CID, bm *blobcache.
 	return nil
 }
 
-// func (s *txStore) List(ctx context.Context, span cadata.Span, ids []cadata.ID) (int, error) {
-// 	begin := cadata.BeginFromSpan(span)
-// 	rows, err := s.tx.Query(`SELECT blob_id FROM store_blobs
-// 		WHERE store_id = ? AND blob_id >= ?
-// 		LIMIT ?
-// 	`, s.intID, begin[:], len(ids))
-// 	if err != nil {
-// 		return 0, err
-// 	}
-// 	defer rows.Close()
-// 	var n int
-// 	for rows.Next() && n < len(ids) {
-// 		var buf []byte
-// 		if err := rows.Scan(&buf); err != nil {
-// 			return 0, err
-// 		}
-// 		ids[n] = cadata.IDFromBytes(buf)
-// 		n++
-// 	}
-// 	if err := rows.Err(); err != nil {
-// 		return 0, err
-// 	}
-// 	return n, nil
-// }
-
 func (s *txStore) MaxSize() int {
 	return s.maxSize
 }
@@ -239,13 +214,6 @@ func (s *store) Delete(ctx context.Context, ids []mycelium.CID) error {
 		return s2.Delete(ctx, ids)
 	})
 }
-
-// func (s *store) List(ctx context.Context, span cadata.Span, ids []cadata.ID) (int, error) {
-// 	return dbutil.DoTx1(ctx, s.db, func(tx *sqlx.Tx) (int, error) {
-// 		s2 := s.txStore(tx)
-// 		return s2.List(ctx, span, ids)
-// 	})
-// }
 
 func (s *store) MaxSize() int {
 	s2 := s.txStore(nil)
