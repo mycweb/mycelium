@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
-	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/spec"
 
 	"golang.org/x/exp/constraints"
@@ -162,9 +161,9 @@ func MarshalAppend(out []byte, x Value) []byte {
 
 // SaveRoot prepares an AnyValue containing v, writing additional data to the store, and then
 // encodes the root and returns the root bytes.
-func SaveRoot(ctx context.Context, dst cadata.PostExister, av *AnyValue) ([]byte, error) {
+func SaveRoot(ctx context.Context, dst mycelium.WO, av *AnyValue) ([]byte, error) {
 	buf := bitbuf.New(av.Type().SizeOf())
-	if err := av.PullInto(ctx, dst, stores.Union{}); err != nil {
+	if err := av.PullInto(ctx, dst, emptyRO{}); err != nil {
 		return nil, err
 	}
 	av.Encode(buf)
@@ -172,7 +171,7 @@ func SaveRoot(ctx context.Context, dst cadata.PostExister, av *AnyValue) ([]byte
 }
 
 // LoadRoot decodes an AnyValue from data, unwraps it and returns the Value
-func LoadRoot(ctx context.Context, s cadata.Getter, data []byte) (*AnyValue, error) {
+func LoadRoot(ctx context.Context, s mycelium.RO, data []byte) (*AnyValue, error) {
 	if len(data)*8 < spec.AnyValueBits {
 		return nil, fmt.Errorf("buffer too short to be an AnyValue")
 	}

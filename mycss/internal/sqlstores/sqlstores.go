@@ -6,7 +6,8 @@ import (
 	"errors"
 	"io"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"blobcache.io/blobcache/src/blobcache"
+	"myceliumweb.org/mycelium"
 
 	"github.com/jmoiron/sqlx"
 
@@ -62,11 +63,11 @@ func DropStore(tx *sqlx.Tx, storeID StoreID) error {
 type txStore struct {
 	tx      *sqlx.Tx
 	intID   StoreID
-	hf      cadata.HashFunc
+	hf      mycelium.KHashFunc
 	maxSize int
 }
 
-func NewTxStore(tx *sqlx.Tx, hf cadata.HashFunc, maxSize int, intID StoreID) *txStore {
+func NewTxStore(tx *sqlx.Tx, hf mycelium.KHashFunc, maxSize int, intID StoreID) *txStore {
 	return &txStore{
 		tx:      tx,
 		hf:      hf,
@@ -75,28 +76,28 @@ func NewTxStore(tx *sqlx.Tx, hf cadata.HashFunc, maxSize int, intID StoreID) *tx
 	}
 }
 
-func (s *txStore) Post(ctx context.Context, salt *cadata.ID, data []byte) (cadata.ID, error) {
+func (s *txStore) Post(ctx context.Context, salt *mycelium.CID, data []byte) (mycelium.CID, error) {
 	if len(data) > s.MaxSize() {
-		return cadata.ID{}, cadata.ErrTooLarge
+		return mycelium.CID{}, blobcache.ErrTooLarge{BlobSize: len(data), MaxSize: s.MaxSize()}
 	}
-	id := s.Hash(salt, data)
+	id := s.KeyedHash(salt, data)
 	if _, err := s.tx.Exec(`INSERT INTO blobs (id, salt, data)
 		VALUES (?, ?, ?) ON CONFLICT DO NOTHING`, id[:], saltBytes(salt), data); err != nil {
-		return cadata.ID{}, err
+		return mycelium.CID{}, err
 	}
 	if err := s.add(id); err != nil {
-		return cadata.ID{}, err
+		return mycelium.CID{}, err
 	}
 	return id, nil
 }
 
-func (s *txStore) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []byte) (int, error) {
+func (s *txStore) Get(ctx context.Context, id mycelium.CID, salt *mycelium.CID, buf []byte) (int, error) {
 	var data []byte
 	if err := s.tx.Get(&data, `SELECT blobs.data FROM store_blobs JOIN blobs ON blob_id = blobs.id
 		WHERE store_id = ? AND blob_id = ?
 	`, s.intID, id[:]); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			err = cadata.ErrNotFound{Key: id}
+			err = blobcache.ErrNotFound{CID: id}
 		}
 		return 0, err
 	}
@@ -106,136 +107,111 @@ func (s *txStore) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf [
 	return copy(buf, data), nil
 }
 
-func (s *txStore) Add(ctx context.Context, id *cadata.ID) error {
+func (s *txStore) Add(ctx context.Context, id mycelium.CID) error {
 	count, err := s.count(id)
 	if err != nil {
 		return err
 	}
 	if count > 0 {
-		return s.add(*id)
+		return s.add(id)
 	} else {
-		return cadata.ErrNotFound{Key: id}
+		return blobcache.ErrNotFound{CID: id}
 	}
 }
 
-func (s *txStore) add(id cadata.ID) error {
+func (s *txStore) add(id mycelium.CID) error {
 	_, err := s.tx.Exec(`INSERT INTO store_blobs (store_id, blob_id)
 		VALUES (?, ?) ON CONFLICT DO NOTHING`, s.intID, id[:])
 	return err
 }
 
-func (s *txStore) Delete(ctx context.Context, id *cadata.ID) error {
-	if _, err := s.tx.Exec(`DELETE FROM store_blobs WHERE store_id = ? AND id = ?`, s.intID, id[:]); err != nil {
-		return err
-	}
-	if count, err := s.count(id); err != nil {
-		return err
-	} else if count < 1 {
-		if _, err := s.tx.Exec(`DELETE FROM blobs WHERE id = ?`, id[:]); err != nil {
+func (s *txStore) Delete(ctx context.Context, ids []mycelium.CID) error {
+	for _, id := range ids {
+		if _, err := s.tx.Exec(`DELETE FROM store_blobs WHERE store_id = ? AND id = ?`, s.intID, id[:]); err != nil {
 			return err
+		}
+		if count, err := s.count(id); err != nil {
+			return err
+		} else if count < 1 {
+			if _, err := s.tx.Exec(`DELETE FROM blobs WHERE id = ?`, id[:]); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func (s *txStore) Exists(ctx context.Context, id *cadata.ID) (bool, error) {
-	var exists bool
-	if err := s.tx.Get(&exists, `SELECT EXISTS(
-		SELECT 1 FROM store_blobs WHERE store_id = ? AND blob_id = ?
-	)`, s.intID, id); err != nil {
-		return false, err
-	}
-	return exists, nil
-}
-
-func (s *txStore) List(ctx context.Context, span cadata.Span, ids []cadata.ID) (int, error) {
-	begin := cadata.BeginFromSpan(span)
-	rows, err := s.tx.Query(`SELECT blob_id FROM store_blobs
-		WHERE store_id = ? AND blob_id >= ?
-		LIMIT ?
-	`, s.intID, begin[:], len(ids))
-	if err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	var n int
-	for rows.Next() && n < len(ids) {
-		var buf []byte
-		if err := rows.Scan(&buf); err != nil {
-			return 0, err
+func (s *txStore) Exists(ctx context.Context, ids []mycelium.CID, bm *blobcache.BitMap) error {
+	for i, id := range ids {
+		var exists bool
+		if err := s.tx.Get(&exists, `SELECT EXISTS(
+			SELECT 1 FROM store_blobs WHERE store_id = ? AND blob_id = ?
+		)`, s.intID, id[:]); err != nil {
+			return err
 		}
-		ids[n] = cadata.IDFromBytes(buf)
-		n++
+		if exists {
+			bm.Set(i)
+		}
 	}
-	if err := rows.Err(); err != nil {
-		return 0, err
-	}
-	return n, nil
+	return nil
 }
 
 func (s *txStore) MaxSize() int {
 	return s.maxSize
 }
 
-func (s *txStore) Hash(tag *cadata.ID, x []byte) cadata.ID {
+func (s *txStore) KeyedHash(tag *mycelium.CID, x []byte) mycelium.CID {
 	return s.hf(tag, x)
 }
 
-func (s *txStore) count(id *cadata.ID) (count int, err error) {
+func (s *txStore) count(id mycelium.CID) (count int, err error) {
 	err = s.tx.Get(&count, `SELECT count(distinct store_id) FROM store_blobs WHERE blob_id = ?`, id[:])
 	return count, err
 }
 
 type store struct {
 	db      *sqlx.DB
-	hf      cadata.HashFunc
+	hf      mycelium.KHashFunc
 	maxSize int
 	intID   StoreID
 }
 
-func NewStore(db *sqlx.DB, hf cadata.HashFunc, maxSize int, intID StoreID) *store {
+func NewStore(db *sqlx.DB, hf mycelium.KHashFunc, maxSize int, intID StoreID) *store {
 	return &store{db: db, hf: hf, maxSize: maxSize, intID: intID}
 }
 
-func (s *store) Post(ctx context.Context, salt *cadata.ID, data []byte) (cadata.ID, error) {
-	return dbutil.DoTx1(ctx, s.db, func(tx *sqlx.Tx) (cadata.ID, error) {
+func (s *store) Post(ctx context.Context, salt *mycelium.CID, data []byte) (mycelium.CID, error) {
+	return dbutil.DoTx1(ctx, s.db, func(tx *sqlx.Tx) (mycelium.CID, error) {
 		s2 := s.txStore(tx)
 		return s2.Post(ctx, salt, data)
 	})
 }
 
-func (s *store) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []byte) (int, error) {
+func (s *store) Get(ctx context.Context, id mycelium.CID, salt *mycelium.CID, buf []byte) (int, error) {
 	return dbutil.DoTx1(ctx, s.db, func(tx *sqlx.Tx) (int, error) {
 		s2 := s.txStore(tx)
 		return s2.Get(ctx, id, salt, buf)
 	})
 }
 
-func (s *store) Add(ctx context.Context, id *cadata.ID) error {
+func (s *store) Add(ctx context.Context, id mycelium.CID) error {
 	return dbutil.DoTx(ctx, s.db, func(tx *sqlx.Tx) error {
 		s2 := s.txStore(tx)
 		return s2.Add(ctx, id)
 	})
 }
 
-func (s *store) Exists(ctx context.Context, id *cadata.ID) (bool, error) {
-	return dbutil.DoTx1(ctx, s.db, func(tx *sqlx.Tx) (bool, error) {
-		s2 := s.txStore(tx)
-		return s2.Exists(ctx, id)
-	})
-}
-
-func (s *store) Delete(ctx context.Context, id *cadata.ID) error {
+func (s *store) Exists(ctx context.Context, ids []mycelium.CID, bm *blobcache.BitMap) error {
 	return dbutil.DoTx(ctx, s.db, func(tx *sqlx.Tx) error {
 		s2 := s.txStore(tx)
-		return s2.Delete(ctx, id)
+		return s2.Exists(ctx, ids, bm)
 	})
 }
 
-func (s *store) List(ctx context.Context, span cadata.Span, ids []cadata.ID) (int, error) {
-	return dbutil.DoTx1(ctx, s.db, func(tx *sqlx.Tx) (int, error) {
+func (s *store) Delete(ctx context.Context, ids []mycelium.CID) error {
+	return dbutil.DoTx(ctx, s.db, func(tx *sqlx.Tx) error {
 		s2 := s.txStore(tx)
-		return s2.List(ctx, span, ids)
+		return s2.Delete(ctx, ids)
 	})
 }
 
@@ -244,9 +220,9 @@ func (s *store) MaxSize() int {
 	return s2.MaxSize()
 }
 
-func (s *store) Hash(salt *cadata.ID, x []byte) cadata.ID {
+func (s *store) KeyedHash(salt *mycelium.CID, x []byte) mycelium.CID {
 	s2 := s.txStore(nil)
-	return s2.Hash(salt, x)
+	return s2.KeyedHash(salt, x)
 }
 
 func (s *store) txStore(tx *sqlx.Tx) txStore {
@@ -260,7 +236,7 @@ func CountBlobs(tx *sqlx.Tx, sid StoreID) (int64, error) {
 	return ret, err
 }
 
-func saltBytes(salt *cadata.ID) []byte {
+func saltBytes(salt *mycelium.CID) []byte {
 	if salt == nil {
 		return nil
 	}

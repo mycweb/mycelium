@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"blobcache.io/blobcache/src/bcsdk"
 )
 
 // ListType is a type that includes Arrays of all lengths for a specific element type
@@ -57,7 +58,7 @@ func (t *ListType) String() string {
 	return fmt.Sprintf("List[%v]", elem)
 }
 
-func (lt *ListType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (lt *ListType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return lt.elemAT.PullInto(ctx, dst, src)
 }
 
@@ -153,8 +154,8 @@ func (l *List) Components() iter.Seq[Value] {
 	}
 }
 
-func (list *List) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
-	if yes, err := dst.Exists(ctx, &list.ref.cid); err != nil {
+func (list *List) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
+	if yes, err := bcsdk.ExistsUnit(ctx, dst, list.ref.cid); err != nil {
 		return err
 	} else if yes {
 		return nil

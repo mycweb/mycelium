@@ -1,7 +1,7 @@
 package myctests
 
 import (
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/myccanon"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
@@ -9,8 +9,8 @@ import (
 
 // EvalVecs2 has more expensive to compute EvalVecs
 // some of them are only worth running with accelerators.
-func EvalVecs2(s cadata.PostExister) (out []EvalVec) {
-	for _, addVecs := range []func([]EvalVec, cadata.PostExister) []EvalVec{
+func EvalVecs2(s mycelium.WO) (out []EvalVec) {
+	for _, addVecs := range []func([]EvalVec, mycelium.WO) []EvalVec{
 		arithEval,
 		nsEval,
 	} {
@@ -19,7 +19,7 @@ func EvalVecs2(s cadata.PostExister) (out []EvalVec) {
 	return out
 }
 
-func arithEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func arithEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	return append(out, []EvalVec{
 		{
@@ -102,7 +102,7 @@ func arithEval(out []EvalVec, s cadata.PostExister) []EvalVec {
 	}...)
 }
 
-func nsEval(out []EvalVec, s cadata.PostExister) []EvalVec {
+func nsEval(out []EvalVec, s mycelium.WO) []EvalVec {
 	eb := EB{}
 	return append(out, []EvalVec{
 		{

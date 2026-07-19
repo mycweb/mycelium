@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -55,7 +55,7 @@ func (tt *FractalType) Zero() Value {
 	return tt.expanded.Zero()
 }
 
-func (tt *FractalType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (tt *FractalType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return tt.expr.PullInto(ctx, dst, src)
 }
 

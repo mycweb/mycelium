@@ -17,7 +17,6 @@ import (
 	"go.uber.org/zap"
 
 	mycelium "myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -218,7 +217,7 @@ func (p *Pod) BlobCount(ctx context.Context) (int64, error) {
 
 // Put sets the symbol k to the value v.
 // It will create a new variable if one does not exist.
-func (p *Pod) Put(ctx context.Context, src cadata.Getter, k string, val Value) error {
+func (p *Pod) Put(ctx context.Context, src mycelium.RO, k string, val Value) error {
 	return dbutil.DoTx(ctx, p.env.DB, func(tx *sqlx.Tx) error {
 		dst := p.newTxStore(tx)
 		if err := val.PullInto(ctx, dst, src); err != nil {
@@ -239,7 +238,7 @@ func (p *Pod) Get(ctx context.Context, k string) (Value, error) {
 // Reset atomically deletes all entries in the Pod's root namespace, and replaces them
 // with the contents of ns.
 // And cells declared in the config will be carried over from the pod.
-func (p *Pod) Reset(ctx context.Context, src cadata.Getter, ns myccanon.Namespace, cfg PodConfig) error {
+func (p *Pod) Reset(ctx context.Context, src mycelium.RO, ns myccanon.Namespace, cfg PodConfig) error {
 	p.procsMu.Lock()
 	defer p.procsMu.Unlock()
 	if err := dbutil.DoTx(ctx, p.env.DB, func(tx *sqlx.Tx) error {
@@ -327,7 +326,7 @@ func (p *Pod) ProcCount() int64 {
 }
 
 // Store returns a read-only view of the Pod's store
-func (p *Pod) Store() cadata.GetExister {
+func (p *Pod) Store() mycelium.RO {
 	return p.newStore()
 }
 
@@ -383,7 +382,7 @@ func (pc ProcCtx) Eval(ctx context.Context, laz *myc.Lazy) (myc.Value, error) {
 	return av2.Unwrap(), nil
 }
 
-func (pc ProcCtx) Store() cadata.Store {
+func (pc ProcCtx) Store() mycelium.RW {
 	return pc.p.getStore()
 }
 
@@ -465,15 +464,15 @@ func (p *Pod) stopAllThreads(ctx context.Context) error {
 	return nil
 }
 
-func (p *Pod) newTxStore(tx *sqlx.Tx) cadata.Store {
+func (p *Pod) newTxStore(tx *sqlx.Tx) mycelium.RW {
 	return sqlstores.NewTxStore(tx, mycelium.Hash, mycelium.MaxSizeBytes, p.storeID)
 }
 
-func (p *Pod) newStore() cadata.Store {
+func (p *Pod) newStore() mycelium.RW {
 	return sqlstores.NewStore(p.env.DB, mycelium.Hash, mycelium.MaxSizeBytes, p.storeID)
 }
 
-func (p *Pod) getStore(r dbutil.Reader) cadata.Store {
+func (p *Pod) getStore(r dbutil.Reader) mycelium.RW {
 	if tx, ok := r.(*sqlx.Tx); ok {
 		return p.newTxStore(tx)
 	} else {

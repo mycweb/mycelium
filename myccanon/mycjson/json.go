@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"myceliumweb.org/mycelium"
 	"strings"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
 
@@ -137,7 +137,7 @@ func EncodeJSON(x JSON) (myc.Value, error) {
 	}
 }
 
-func PostJSON(ctx context.Context, dst cadata.PostExister, x JSON) (myc.Ref, error) {
+func PostJSON(ctx context.Context, dst mycelium.WO, x JSON) (myc.Ref, error) {
 	val, err := EncodeJSON(x)
 	if err != nil {
 		return myc.Ref{}, err
@@ -145,7 +145,7 @@ func PostJSON(ctx context.Context, dst cadata.PostExister, x JSON) (myc.Ref, err
 	return myc.Post(ctx, dst, val)
 }
 
-func DecodeJSON(ctx context.Context, src cadata.Getter, x myc.Value) (JSON, error) {
+func DecodeJSON(ctx context.Context, src mycelium.RO, x myc.Value) (JSON, error) {
 	if !myc.TypeContains(JSONType(), x) {
 		return nil, fmt.Errorf("decode json: wrong type HAVE: %v :: %v", x, x.Type())
 	}
@@ -190,7 +190,7 @@ func DecodeJSON(ctx context.Context, src cadata.Getter, x myc.Value) (JSON, erro
 	}
 }
 
-func decodeJSONPair(ctx context.Context, src cadata.Getter, x myc.Value) (JSONString, JSON, error) {
+func decodeJSONPair(ctx context.Context, src mycelium.RO, x myc.Value) (JSONString, JSON, error) {
 	ty := myc.ProductType{myc.StringType(), JSONType()}
 	if !myc.TypeContains(ty, x) {
 		return "", nil, fmt.Errorf("decodeJSONPair: wrong type. HAVE: %v", x)
@@ -204,7 +204,7 @@ func decodeJSONPair(ctx context.Context, src cadata.Getter, x myc.Value) (JSONSt
 	return JSONString(k), v, nil
 }
 
-func PullJSON(ctx context.Context, dst cadata.PostExister, src cadata.Getter, x JSON) error {
+func PullJSON(ctx context.Context, dst mycelium.WO, src mycelium.RO, x JSON) error {
 	val, err := EncodeJSON(x)
 	if err != nil {
 		return err

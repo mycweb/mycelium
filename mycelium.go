@@ -1,9 +1,12 @@
 package mycelium
 
 import (
+	"context"
+
+	"blobcache.io/blobcache/src/bcsdk"
+	"blobcache.io/blobcache/src/blobcache"
 	"lukechampine.com/blake3"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -23,21 +26,21 @@ const (
 
 type (
 	// CID is a Content ID
-	CID = cadata.ID
+	CID = blobcache.CID
 
-	Store   = cadata.Store
-	Getter  = cadata.Getter
-	Poster  = cadata.Poster
-	Exister = cadata.Exister
+	Store   = bcsdk.RW
+	Getter  = bcsdk.RO
+	Poster  = bcsdk.WO
+	Exister = bcsdk.Exists
 
-	PostExister = cadata.PostExister
-	GetExister  = cadata.GetExister
+	PostExister = bcsdk.WO
+	GetExister  = bcsdk.RO
 )
 
 // Hash calculates the hash of x.
 // If tag == nil, then the hash is unkeyed.
 // If tag != nil, then the hash will be keyed with the tag.
-func Hash(tag *cadata.ID, x []byte) (ret cadata.ID) {
+func Hash(tag *CID, x []byte) (ret CID) {
 	var key []byte
 	if tag != nil {
 		key = tag[:]
@@ -46,4 +49,25 @@ func Hash(tag *cadata.ID, x []byte) (ret cadata.ID) {
 	h.Write(x)
 	h.Sum(ret[:0])
 	return ret
+}
+
+// KHashFunc is a keyed hash function
+type KHashFunc = func(salt *CID, data []byte) CID
+
+// RO is the read only store interface
+type RO interface {
+	Get(ctx context.Context, cid CID, salt *CID, buf []byte) (int, error)
+	bcsdk.Exists
+	KeyedHash(salt *CID, data []byte) CID
+}
+
+type WO interface {
+	Post(ctx context.Context, salt *CID, data []byte) (CID, error)
+	bcsdk.Exists
+	KeyedHash(salt *CID, data []byte) CID
+}
+
+type RW interface {
+	RO
+	WO
 }

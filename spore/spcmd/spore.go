@@ -1,10 +1,12 @@
 package spcmd
 
 import (
+	"bufio"
+
+	"github.com/jmoiron/sqlx"
 	"go.brendoncarroll.net/star"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/myccmd"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -20,7 +22,7 @@ func Root() star.Command {
 
 var rootCmd = star.NewDir(star.Metadata{
 	Short: "work with spore programs and expressions",
-}, map[star.Symbol]star.Command{
+}, map[string]star.Command{
 	"eval":  spEval,
 	"build": spBuild,
 	"test":  spTest,
@@ -33,10 +35,13 @@ var spEval = star.Command{
 	Metadata: star.Metadata{
 		Short: "evaluate a spore expression in the context of a pod",
 	},
-	Flags: []star.IParam{dbParam, podIDParam},
-	Pos:   []star.IParam{exprParam},
+	Flags: map[string]star.Flag{"db": &myccmd.DBParam, "pod": &myccmd.PodIDParam},
+	Pos:   []star.Positional{&exprParam},
 	F: func(c star.Context) error {
-		db := dbParam.Load(c)
+		db, err := loadDB(c)
+		if err != nil {
+			return err
+		}
 		sys := mycss.NewSystem(db)
 		pod, err := sys.Get(c, myccmd.PodIDParam.Load(c))
 		if err != nil {
@@ -60,23 +65,27 @@ var spEval = star.Command{
 		if err != nil {
 			return err
 		}
-		printer.Printer{}.Print(c.StdOut, spore.Decompile(out))
+		w := bufio.NewWriter(c.StdOut)
+		if err := (printer.Printer{}).Print(w, spore.Decompile(out)); err != nil {
+			return err
+		}
+		if err := w.Flush(); err != nil {
+			return err
+		}
 		c.Printf("\n%v :: %v\n", out, out.Type())
 		return nil
 	},
 }
 
-var exprParam = star.Param[string]{Name: "expr", Parse: star.ParseString}
+var exprParam = star.Required[string]{PosName: "expr", Parse: star.ParseString}
 
-var (
-	dbParam    = myccmd.DBParam
-	podIDParam = myccmd.PodIDParam
-
-	cellParam    = myccmd.CellParam
-	netParam     = myccmd.NetNodeParam
-	consoleParam = myccmd.ConsoleParam
-)
-
-func newMemStore() cadata.Store {
+func newMemStore() mycelium.RW {
 	return stores.NewMem(mycelium.Hash, mycelium.MaxSizeBytes)
+}
+
+func loadDB(c star.Context) (*sqlx.DB, error) {
+	if db, ok := myccmd.DBParam.LoadOpt(c); ok {
+		return db, nil
+	}
+	return myccmd.DBParam.Parse(":memory:")
 }

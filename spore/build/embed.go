@@ -7,12 +7,11 @@ import (
 	"path/filepath"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mycmem"
 )
 
 // Embed embeds a file from p within the context.
-func (c *Context) Embed(ctx context.Context, dst cadata.Store, p string) (Value, error) {
+func (c *Context) Embed(ctx context.Context, dst mycelium.RW, p string) (Value, error) {
 	fsx, p, _, err := c.find(p)
 	if err != nil {
 		return nil, err
@@ -28,7 +27,7 @@ func (c *Context) Embed(ctx context.Context, dst cadata.Store, p string) (Value,
 	}
 }
 
-func (c *Context) embedDir(ctx context.Context, dst cadata.Store, fsx fs.FS, p string) (Value, error) {
+func (c *Context) embedDir(ctx context.Context, dst mycelium.RW, fsx fs.FS, p string) (Value, error) {
 	ents, err := fs.ReadDir(fsx, p)
 	if err != nil {
 		return nil, err
@@ -48,7 +47,7 @@ func (c *Context) embedDir(ctx context.Context, dst cadata.Store, fsx fs.FS, p s
 	return Product(ret), nil
 }
 
-func (c *Context) embedFile(ctx context.Context, dst cadata.Store, fsx fs.FS, p string) (Value, error) {
+func (c *Context) embedFile(ctx context.Context, dst mycelium.RW, fsx fs.FS, p string) (Value, error) {
 	f, err := fsx.Open(p)
 	if err != nil {
 		return nil, err

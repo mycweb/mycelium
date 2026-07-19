@@ -15,8 +15,8 @@ import (
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -53,7 +53,7 @@ func run(ctx context.Context, window *app.Window, pod *mycss.Pod) error {
 		port := myc.NewRandPort(GUI_OplistType)
 		vm := pctx.VM()
 		vm.PutPort(mvm1.PortFromBytes(port.Data()), mvm1.PortBackend{
-			Interact: func(ctx context.Context, s cadata.Store, buf []mvm1.Word) error {
+			Interact: func(ctx context.Context, s mycelium.RW, buf []mvm1.Word) error {
 				data := bytesFromWords(buf)
 				load := func(ref myc.Ref) (myc.Value, error) {
 					return myc.Load(ctx, s, ref)

@@ -23,7 +23,6 @@ import (
 	"golang.org/x/exp/maps"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/myccanon/mychtml"
@@ -190,10 +189,10 @@ func (s *Server) blob(c *fiber.Ctx) error {
 	if len(refData) != mycmem.RefBytes {
 		return fmt.Errorf("ref must decoded to 32 bytes. HAVE len=%d", len(refData))
 	}
-	var cid cadata.ID
+	var cid mycelium.CID
 	copy(cid[:], refData)
 	var buf [mycelium.MaxSizeBytes]byte
-	n, err := pod.Store().Get(ctx, &cid, nil, buf[:])
+	n, err := pod.Store().Get(ctx, cid, nil, buf[:])
 	if err != nil {
 		return err
 	}

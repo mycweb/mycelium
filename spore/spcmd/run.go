@@ -14,8 +14,13 @@ var spRun = star.Command{
 	Metadata: star.Metadata{
 		Short: "create a new pod to run an executable package",
 	},
-	Flags: []star.IParam{dbParam, cellParam, netParam, consoleParam},
-	Pos:   []star.IParam{pkgParam},
+	Flags: map[string]star.Flag{
+		"db":      &myccmd.DBParam,
+		"cell":    &myccmd.CellParam,
+		"net":     &myccmd.NetNodeParam,
+		"console": &myccmd.ConsoleParam,
+	},
+	Pos: []star.Positional{&pkgParam},
 	F: func(c star.Context) error {
 		ctx := c.Context
 		buf := bytes.Buffer{}
@@ -23,7 +28,10 @@ var spRun = star.Command{
 		if err := buildZipFile(ctx, pkgPath, true, &buf); err != nil {
 			return err
 		}
-		db := dbParam.Load(c)
+		db, err := loadDB(c)
+		if err != nil {
+			return err
+		}
 		sys := mycss.NewSystem(db)
 		pod, err := sys.Create(ctx)
 		if err != nil {
@@ -46,8 +54,13 @@ var spRunGui = star.Command{
 	Metadata: star.Metadata{
 		Short: "run a package with a Graphical User Interface",
 	},
-	Flags: []star.IParam{dbParam, cellParam, netParam, consoleParam},
-	Pos:   []star.IParam{pkgParam},
+	Flags: map[string]star.Flag{
+		"db":      &myccmd.DBParam,
+		"cell":    &myccmd.CellParam,
+		"net":     &myccmd.NetNodeParam,
+		"console": &myccmd.ConsoleParam,
+	},
+	Pos: []star.Positional{&pkgParam},
 	F: func(c star.Context) error {
 		ctx := c.Context
 		buf := bytes.Buffer{}
@@ -55,7 +68,10 @@ var spRunGui = star.Command{
 		if err := buildZipFile(ctx, pkgPath, false, &buf); err != nil {
 			return err
 		}
-		db := dbParam.Load(c)
+		db, err := loadDB(c)
+		if err != nil {
+			return err
+		}
 		sys := mycss.NewSystem(db)
 		pod, err := sys.Create(ctx)
 		if err != nil {

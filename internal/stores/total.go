@@ -3,29 +3,33 @@ package stores
 import (
 	"context"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"blobcache.io/blobcache/src/blobcache"
+	"myceliumweb.org/mycelium"
 )
 
-var _ cadata.PostExister = &Total{}
+var _ mycelium.WO = &Total{}
 
 type Total struct {
-	hash    cadata.HashFunc
+	hash    mycelium.KHashFunc
 	maxSize int
 }
 
-func NewTotal(hash cadata.HashFunc, maxSize int) *Total {
+func NewTotal(hash mycelium.KHashFunc, maxSize int) *Total {
 	return &Total{maxSize: maxSize, hash: hash}
 }
 
-func (t Total) Post(ctx context.Context, tag *cadata.ID, data []byte) (cadata.ID, error) {
+func (t Total) Post(ctx context.Context, tag *mycelium.CID, data []byte) (mycelium.CID, error) {
 	return t.hash(tag, data), nil
 }
 
-func (t Total) Exists(ctx context.Context, id *cadata.ID) (bool, error) {
-	return true, nil
+func (t Total) Exists(ctx context.Context, cids []mycelium.CID, bm *blobcache.BitMap) error {
+	for i := range cids {
+		bm.Set(i)
+	}
+	return nil
 }
 
-func (t Total) Hash(tag *cadata.ID, x []byte) cadata.ID {
+func (t Total) KeyedHash(tag *mycelium.CID, x []byte) mycelium.CID {
 	return t.hash(tag, x)
 }
 

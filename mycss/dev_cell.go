@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"myceliumweb.org/mycelium"
 
 	"github.com/jmoiron/sqlx"
 	"go.brendoncarroll.net/stdctx/logctx"
 	"go.uber.org/zap"
 
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -88,7 +88,7 @@ func (c *cell) PortType() *myc.PortType {
 
 func (c *cell) Port() mvm1.PortBackend {
 	return mvm1.PortBackend{
-		Interact: func(ctx context.Context, s cadata.Store, buf []mvm1.Word) error {
+		Interact: func(ctx context.Context, s mycelium.RW, buf []mvm1.Word) error {
 			reqData := wordsToBytes(buf)
 			req := myc.Product{&myc.AnyValue{}, &myc.AnyValue{}}
 			load := func(ref myc.Ref) (myc.Value, error) {
@@ -109,7 +109,7 @@ func (c *cell) Port() mvm1.PortBackend {
 			}
 			return bytesToWords(data, buf[:spec.AnyValueBits/mvm1.WordBits])
 		},
-		Input: func(ctx context.Context, dst cadata.PostExister, buf []mvm1.Word) error {
+		Input: func(ctx context.Context, dst mycelium.WO, buf []mvm1.Word) error {
 			av, err := c.Load(ctx)
 			if err != nil {
 				return err

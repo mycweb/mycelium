@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -137,7 +136,7 @@ func (c *Context) WriteZip(ctx context.Context, pkgName string, isExec bool, w i
 }
 
 // compile invokes the compiler on the files in a source directory
-func (c *Context) compile(ctx context.Context, _ cadata.PostExister, base Namespace, sd *SourceDir) (*compile.Package, error) {
+func (c *Context) compile(ctx context.Context, _ mycelium.WO, base Namespace, sd *SourceDir) (*compile.Package, error) {
 	s2 := stores.NewMem(mycelium.Hash, mycelium.MaxSizeBytes)
 	comp := compile.New(s2, spore.Preamble())
 	pkg, err := comp.Compile(ctx, base, c.cache, slices2.Map(sd.Files, func(x *SourceFile) compile.SourceFile {
@@ -149,7 +148,7 @@ func (c *Context) compile(ctx context.Context, _ cadata.PostExister, base Namesp
 	return pkg, nil
 }
 
-func LoadPkg(zr *zip.Reader) (*compile.Package, cadata.Getter, error) {
+func LoadPkg(zr *zip.Reader) (*compile.Package, mycelium.RO, error) {
 	val, src, err := myczip.Load(zr)
 	if err != nil {
 		return nil, nil, err

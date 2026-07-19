@@ -13,9 +13,12 @@ var invokeJSON = star.Command{
 	Metadata: star.Metadata{
 		Short: "call invokeJSON method in a pod with JSON data",
 	},
-	Flags: []star.IParam{DBParam, PodIDParam},
+	Flags: map[string]star.Flag{"db": &DBParam, "pod": &PodIDParam},
 	F: func(c star.Context) error {
-		db := DBParam.Load(c)
+		db, err := loadDB(c)
+		if err != nil {
+			return err
+		}
 		sys := mycss.NewSystem(db)
 		ctx := c.Context
 		sys.Get(ctx, PodIDParam.Load(c))

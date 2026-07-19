@@ -9,8 +9,6 @@ import (
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
 	myc "myceliumweb.org/mycelium/mycmem"
-
-	"myceliumweb.org/mycelium/internal/cadata"
 )
 
 // HTML is a syntax tree node in an HTML document
@@ -19,16 +17,16 @@ type HTML struct {
 	Text     string
 	Children []HTML
 
-	id cadata.ID
+	id mycelium.CID
 }
 
-func (n *HTML) GetID() cadata.ID {
+func (n *HTML) GetID() mycelium.CID {
 	if n.id.IsZero() {
 		ref, err := PostHTML(context.TODO(), stores.NewTotal(mycelium.Hash, mycelium.MaxSizeBytes), *n)
 		if err != nil {
 			panic(err)
 		}
-		n.id = cadata.ID(ref.Bytes()[:32])
+		n.id = ref.Data()
 	}
 	return n.id
 }
@@ -49,7 +47,7 @@ func HTMLType() myc.Type {
 }
 
 // EncodeHTML encodes an HTML node as a Mycelium Value using s as a store
-func EncodeHTML(ctx context.Context, s cadata.PostExister, x HTML) (myc.Value, error) {
+func EncodeHTML(ctx context.Context, s mycelium.WO, x HTML) (myc.Value, error) {
 	var children []myc.Value
 	for _, child := range x.Children {
 		ref, err := PostHTML(ctx, s, child)
@@ -66,7 +64,7 @@ func EncodeHTML(ctx context.Context, s cadata.PostExister, x HTML) (myc.Value, e
 }
 
 // PostHTML encodes and then posts an HTML node to s, and then returns a Mycelium Ref
-func PostHTML(ctx context.Context, s cadata.PostExister, x HTML) (myc.Ref, error) {
+func PostHTML(ctx context.Context, s mycelium.WO, x HTML) (myc.Ref, error) {
 	val, err := EncodeHTML(ctx, s, x)
 	if err != nil {
 		return myc.Ref{}, err
@@ -75,7 +73,7 @@ func PostHTML(ctx context.Context, s cadata.PostExister, x HTML) (myc.Ref, error
 }
 
 // DecodeHTML converts a mycelium Value into an HTML node.
-func DecodeHTML(ctx context.Context, s cadata.Getter, x myc.Value) (HTML, error) {
+func DecodeHTML(ctx context.Context, s mycelium.RO, x myc.Value) (HTML, error) {
 	if !myc.TypeContains(HTMLType(), x) {
 		return HTML{}, fmt.Errorf("cannot convert %v to HTML node", x)
 	}
@@ -99,7 +97,7 @@ func DecodeHTML(ctx context.Context, s cadata.Getter, x myc.Value) (HTML, error)
 	}, nil
 }
 
-func LoadHTML(ctx context.Context, s cadata.Getter, x myc.Ref) (HTML, error) {
+func LoadHTML(ctx context.Context, s mycelium.RO, x myc.Ref) (HTML, error) {
 	val, err := myc.Load(ctx, s, x)
 	if err != nil {
 		return HTML{}, err
@@ -107,7 +105,7 @@ func LoadHTML(ctx context.Context, s cadata.Getter, x myc.Ref) (HTML, error) {
 	return DecodeHTML(ctx, s, val)
 }
 
-func PullHTML(ctx context.Context, dst cadata.PostExister, src cadata.Getter, x myc.Value) error {
+func PullHTML(ctx context.Context, dst mycelium.WO, src mycelium.RO, x myc.Value) error {
 	return x.PullInto(ctx, dst, src)
 }
 

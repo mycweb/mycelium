@@ -6,7 +6,7 @@ import (
 
 	"slices"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 
@@ -14,14 +14,14 @@ import (
 )
 
 type Compiler struct {
-	store  cadata.Store
+	store  mycelium.RW
 	accels map[Fingerprint]AccelFunc
 	eval   func(context.Context, []I) ([]Word, error)
 
 	prodOffCache map[Fingerprint][]int
 }
 
-func newCompiler(s cadata.Store, accels map[Fingerprint]AccelFunc, eval func(context.Context, []I) ([]Word, error)) Compiler {
+func newCompiler(s mycelium.RW, accels map[Fingerprint]AccelFunc, eval func(context.Context, []I) ([]Word, error)) Compiler {
 	return Compiler{store: s, eval: eval, accels: accels}
 }
 
@@ -1259,7 +1259,7 @@ type machCtx struct {
 	// layout describes the type of data currently on the stack
 	layout []Type
 	// store is the machine's store, which is read-only for the purposes of machCtx
-	store cadata.Getter
+	store mycelium.RO
 	// scratch is the number of words before the indexed parameter
 	scratch []int
 	self    dynValue
@@ -1359,10 +1359,10 @@ type Loadable interface {
 }
 
 // Load loads data from a store
-func Load[T Loadable](ctx context.Context, s cadata.Getter, ref Ref, dst T) error {
+func Load[T Loadable](ctx context.Context, s mycelium.RO, ref Ref, dst T) error {
 	cid := ref.CID()
 	buf := make([]byte, divCeil(dst.Size(), 8))
-	n, err := s.Get(ctx, &cid, nil, buf)
+	n, err := s.Get(ctx, cid, nil, buf)
 	if err != nil {
 		return err
 	}

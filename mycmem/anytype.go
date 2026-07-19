@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
+	"blobcache.io/blobcache/src/bcsdk"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -33,10 +34,10 @@ func (AnyTypeType) SizeOf() int {
 	return spec.AnyTypeBits
 }
 
-func (AnyTypeType) PullInto(context.Context, cadata.PostExister, cadata.Getter) error { return nil }
-func (AnyTypeType) Encode(BitBuf)                                                     {}
-func (AnyTypeType) Decode(BitBuf, LoadFunc) error                                     { return nil }
-func (AnyTypeType) Zero() Value                                                       { return NewAnyType(Bottom()) }
+func (AnyTypeType) PullInto(context.Context, mycelium.WO, mycelium.RO) error { return nil }
+func (AnyTypeType) Encode(BitBuf)                                            {}
+func (AnyTypeType) Decode(BitBuf, LoadFunc) error                            { return nil }
+func (AnyTypeType) Zero() Value                                              { return NewAnyType(Bottom()) }
 
 func (t AnyTypeType) Components() iter.Seq[Value] { return emptyIter }
 
@@ -83,8 +84,8 @@ func (at *AnyType) SizeOf() int {
 	return at.x.SizeOf()
 }
 
-func (at *AnyType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
-	if yes, err := dst.Exists(ctx, &at.ref.cid); err != nil {
+func (at *AnyType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
+	if yes, err := bcsdk.ExistsUnit(ctx, dst, at.ref.cid); err != nil {
 		return err
 	} else if yes {
 		return nil

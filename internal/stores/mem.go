@@ -3,28 +3,29 @@ package stores
 import (
 	"context"
 
+	"blobcache.io/blobcache/src/blobcache"
 	"go.brendoncarroll.net/state"
 	"go.brendoncarroll.net/state/kv"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 )
 
-var _ cadata.Store = &Mem{}
+// var _ mycelium.RW = &Mem{}
 
 type memEntry struct {
-	salt  *cadata.ID
+	salt  mycelium.CID
 	value []byte
 }
 
 type Mem struct {
-	hf      cadata.HashFunc
+	hf      blobcache.KeyedHashFunc
 	maxSize int
-	kv      *kv.MemStore[cadata.ID, memEntry]
+	kv      *kv.MemStore[mycelium.CID, memEntry]
 }
 
-func NewMem(hf cadata.HashFunc, maxSize int) *Mem {
+func NewMem(hf blobcache.KeyedHashFunc, maxSize int) *Mem {
 	return &Mem{
-		kv: kv.NewMemStore[cadata.ID, memEntry](func(a, b cadata.ID) int {
+		kv: kv.NewMemStore[mycelium.CID, memEntry](func(a, b mycelium.CID) int {
 			return a.Compare(b)
 		}),
 		hf:      hf,
@@ -32,45 +33,67 @@ func NewMem(hf cadata.HashFunc, maxSize int) *Mem {
 	}
 }
 
-func (s *Mem) Post(ctx context.Context, salt *cadata.ID, data []byte) (cadata.ID, error) {
+func (s *Mem) Post(ctx context.Context, salt *mycelium.CID, data []byte) (mycelium.CID, error) {
 	if len(data) > s.maxSize {
-		return cadata.ID{}, cadata.ErrTooLarge
+		return mycelium.CID{}, blobcache.ErrTooLarge{MaxSize: s.maxSize, BlobSize: len(data)}
 	}
 	id := s.hf(salt, data)
+	var storedSalt mycelium.CID
+	if salt != nil {
+		storedSalt = *salt
+	}
 	if err := s.kv.Put(ctx, id, memEntry{
-		salt:  cloneSalt(salt),
+		salt:  storedSalt,
 		value: append([]byte{}, data...),
 	}); err != nil {
-		return cadata.ID{}, err
+		return mycelium.CID{}, err
 	}
 	return id, nil
 }
 
-func (s *Mem) Get(ctx context.Context, id *cadata.ID, salt *cadata.ID, buf []byte) (int, error) {
-	ent, err := kv.Get(ctx, s.kv, *id)
+func (s *Mem) Get(ctx context.Context, id mycelium.CID, salt *mycelium.CID, buf []byte) (int, error) {
+	ent, err := kv.Get(ctx, s.kv, id)
 	if err != nil {
-		if state.IsErrNotFound[cadata.ID](err) {
-			return 0, cadata.ErrNotFound{Key: id}
+		if state.IsErrNotFound[mycelium.CID](err) {
+			return 0, blobcache.ErrNotFound{CID: id}
 		}
 		return 0, err
 	}
 	return copy(buf, ent.value), nil
 }
 
-func (s *Mem) Exists(ctx context.Context, id *cadata.ID) (bool, error) {
-	return s.kv.Exists(ctx, *id)
+func (s *Mem) Exists(ctx context.Context, cids []mycelium.CID, bm *blobcache.BitMap) error {
+	for i, cid := range cids {
+		yes, err := s.kv.Exists(ctx, cid)
+		if err != nil {
+			return err
+		}
+		if yes {
+			bm.Set(i)
+		}
+	}
+	return nil
 }
 
-func (s *Mem) Delete(ctx context.Context, id *cadata.ID) error {
-	return s.kv.Delete(ctx, *id)
+func (s *Mem) Delete(ctx context.Context, cids []mycelium.CID) error {
+	for _, cid := range cids {
+		if err := s.kv.Delete(ctx, cid); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func (s *Mem) List(ctx context.Context, span cadata.Span, ids []cadata.ID) (int, error) {
-	return s.kv.List(ctx, span, ids)
+func (s *Mem) KeyedHash(salt *mycelium.CID, data []byte) mycelium.CID {
+	return s.hf(salt, data)
 }
 
-func (s *Mem) All() (ret []cadata.ID) {
-	kv.ForEach(context.TODO(), s.kv, state.TotalSpan[cadata.ID](), func(i cadata.ID) error {
+// func (s *Mem) List(ctx context.Context, span mycelium.Span, ids []mycelium.CID) (int, error) {
+// 	return s.kv.List(ctx, span, ids)
+// }
+
+func (s *Mem) All() (ret []mycelium.CID) {
+	kv.ForEach(context.TODO(), s.kv, state.TotalSpan[mycelium.CID](), func(i mycelium.CID) error {
 		ret = append(ret, i)
 		return nil
 	})
@@ -79,12 +102,4 @@ func (s *Mem) All() (ret []cadata.ID) {
 
 func (s *Mem) Len() int {
 	return s.kv.Len()
-}
-
-func cloneSalt(salt *cadata.ID) *cadata.ID {
-	if salt == nil {
-		return nil
-	}
-	ret := *salt
-	return &ret
 }

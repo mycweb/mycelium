@@ -12,13 +12,13 @@ import (
 var zipCmd = star.NewDir(star.Metadata{
 	Short: "deal with myczip files",
 },
-	map[star.Symbol]star.Command{
+	map[string]star.Command{
 		"inspect": zipInspectCmd,
 	},
 )
 
 var zipInspectCmd = star.Command{
-	Pos: []star.IParam{fileParam},
+	Pos: []star.Positional{&fileParam},
 	F: func(c star.Context) error {
 		f := fileParam.Load(c)
 		finfo, err := f.Stat()

@@ -2,15 +2,15 @@ package myctests
 
 import (
 	"context"
+	"myceliumweb.org/mycelium"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mycexpr"
 	myc "myceliumweb.org/mycelium/mycmem"
 	"myceliumweb.org/mycelium/spec"
 )
 
 // InterestingVaues returns a list of values worth testing against.
-func InterestingValues(s cadata.PostExister) []myc.Value {
+func InterestingValues(s mycelium.WO) []myc.Value {
 	eb := EB{}
 	mkStr := myc.NewString
 	return []myc.Value{
@@ -153,7 +153,7 @@ func StringType() Type {
 	return myc.ListOf(myc.ByteType())
 }
 
-func mkRef(s cadata.PostExister, x Value) *Ref {
+func mkRef(s mycelium.WO, x Value) *Ref {
 	ref, err := myc.Post(context.TODO(), s, x)
 	if err != nil {
 		panic(err)

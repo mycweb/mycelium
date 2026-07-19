@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"iter"
 	"math/bits"
-
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 
 	"golang.org/x/exp/constraints"
 )
@@ -122,7 +121,7 @@ func (z BitArray) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (z BitArray) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (z BitArray) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 
@@ -265,7 +264,7 @@ func (n *B8) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (*B8) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (*B8) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 
@@ -330,7 +329,7 @@ func (n B16) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (*B16) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (*B16) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 
@@ -407,7 +406,7 @@ func (n B32) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (*B32) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (*B32) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 
@@ -476,7 +475,7 @@ func (B64) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (*B64) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (*B64) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 

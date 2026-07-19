@@ -16,7 +16,7 @@ func TestStore(t *testing.T) {
 	require.NoError(t, err)
 
 	// var n int32
-	// storetest.TestStore(t, func(t testing.TB) cadata.Store {
+	// storetest.TestStore(t, func(t testing.TB) mycelium.RW {
 	// 	i := atomic.AddInt32(&n, 1)
 	// 	s := NewStore(db, myc.Hash, 1<<21, uint64(i))
 	// 	return s

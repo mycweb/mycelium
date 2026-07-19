@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -65,7 +64,7 @@ func List(pkg compile.Package) ([]Test, error) {
 }
 
 // Run runs the Test x and returns a result
-func Run(ctx context.Context, src cadata.Getter, x Test) (Result, error) {
+func Run(ctx context.Context, src mycelium.RO, x Test) (Result, error) {
 	s := stores.NewMem(mycelium.Hash, mycelium.MaxSizeBytes)
 	vm := mvm1.New(0, s, mvm1.DefaultAccels())
 	port := myc.NewRandPort(TestEnvType)

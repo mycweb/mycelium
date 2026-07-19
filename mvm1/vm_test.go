@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/testutil"
 	"myceliumweb.org/mycelium/myccanon"
 	"myceliumweb.org/mycelium/mycexpr"
@@ -419,7 +419,7 @@ func TestFingerprint(t *testing.T) {
 			t2Words := encodeWords(t, val.Type().Type())
 			fp2 := fingerprint(Type2(t2Words), tyWords, valWords, int(val.Type().SizeOf()))
 
-			require.Equal(t, cadata.ID(fp1), Ref(fp2).CID())
+			require.Equal(t, mycelium.CID(fp1), Ref(fp2).CID())
 		})
 	}
 }

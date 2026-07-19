@@ -5,10 +5,10 @@ import (
 	"crypto/rand"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 
 	"go.brendoncarroll.net/exp/slices2"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -75,7 +75,7 @@ func (pt *PortType) String() string {
 	return fmt.Sprintf("Port[%v, %v, %v, %v]", pt.Output, pt.Input, pt.Request, pt.Response)
 }
 
-func (pt *PortType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (pt *PortType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	for _, at := range []*AnyType{
 		NewAnyType(pt.Input),
 		NewAnyType(pt.Output),
@@ -165,7 +165,7 @@ func (p *Port) Data() [32]byte {
 	return p.data
 }
 
-func (port *Port) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (port *Port) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 

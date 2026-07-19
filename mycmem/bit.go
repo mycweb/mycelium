@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"iter"
-
-	"myceliumweb.org/mycelium/internal/cadata"
+	"myceliumweb.org/mycelium"
 
 	"golang.org/x/exp/constraints"
 )
@@ -25,9 +24,9 @@ func (BitType) String() string {
 
 func (BitType) SizeOf() int { return 1 }
 
-func (BitType) PullInto(context.Context, cadata.PostExister, cadata.Getter) error { return nil }
-func (BitType) Encode(BitBuf)                                                     {}
-func (BitType) Decode(BitBuf, LoadFunc) error                                     { return nil }
+func (BitType) PullInto(context.Context, mycelium.WO, mycelium.RO) error { return nil }
+func (BitType) Encode(BitBuf)                                            {}
+func (BitType) Decode(BitBuf, LoadFunc) error                            { return nil }
 func (BitType) Zero() Value {
 	return new(Bit)
 }
@@ -66,7 +65,7 @@ func (b *Bit) AsBool() bool {
 
 func (b *Bit) Components() iter.Seq[Value] { return emptyIter }
 
-func (Bit) PullInto(context.Context, cadata.PostExister, cadata.Getter) error { return nil }
+func (Bit) PullInto(context.Context, mycelium.WO, mycelium.RO) error { return nil }
 
 func (x *Bit) Encode(bb BitBuf) {
 	bb.Put(0, uint8(*x))

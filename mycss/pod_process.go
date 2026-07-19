@@ -8,7 +8,6 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
@@ -23,7 +22,7 @@ type process struct {
 	id      ProcID
 	storeID sqlstores.StoreID
 
-	store cadata.Store
+	store mycelium.RW
 	vm    *mvm1.VM
 	ns    myccanon.Namespace
 
@@ -101,7 +100,7 @@ func (pr *process) await(ctx context.Context) error {
 	}
 }
 
-func (pr *process) getStore() cadata.Store {
+func (pr *process) getStore() mycelium.RW {
 	return pr.store
 }
 

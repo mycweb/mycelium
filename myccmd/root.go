@@ -17,7 +17,7 @@ func Root() star.Command {
 
 var root = star.NewDir(star.Metadata{
 	Short: "Mycelium Web Platform",
-}, map[star.Symbol]star.Command{
+}, map[string]star.Command{
 	// pod commands
 	"run":         run,
 	"run-pods":    runPods,
@@ -34,11 +34,14 @@ var root = star.NewDir(star.Metadata{
 })
 
 var status = star.Command{
-	Flags: []star.IParam{DBParam},
-	Pos:   []star.IParam{},
+	Flags: map[string]star.Flag{"db": &DBParam},
+	Pos:   []star.Positional{},
 	F: func(ctx star.Context) error {
 		ctx.Printf("STATUS\n")
-		db := DBParam.Load(ctx)
+		db, err := loadDB(ctx)
+		if err != nil {
+			return err
+		}
 		if err := db.Ping(); err != nil {
 			return err
 		}
@@ -46,9 +49,7 @@ var status = star.Command{
 	},
 }
 
-var DBParam = star.Param[*sqlx.DB]{
-	Name:    "db",
-	Default: star.Ptr(":memory:"),
+var DBParam = star.Optional[*sqlx.DB]{
 	Parse: func(x string) (*sqlx.DB, error) {
 		db, err := mycss.OpenDB(x)
 		if err != nil {
@@ -61,10 +62,22 @@ var DBParam = star.Param[*sqlx.DB]{
 	},
 }
 
-var ListenerParam = star.Param[net.Listener]{
-	Name:    "l",
-	Default: star.Ptr("127.0.0.1:6666"),
+var ListenerParam = star.Optional[net.Listener]{
 	Parse: func(x string) (net.Listener, error) {
 		return net.Listen("tcp", x)
 	},
+}
+
+func loadDB(c star.Context) (*sqlx.DB, error) {
+	if db, ok := DBParam.LoadOpt(c); ok {
+		return db, nil
+	}
+	return DBParam.Parse(":memory:")
+}
+
+func loadListener(c star.Context) (net.Listener, error) {
+	if lis, ok := ListenerParam.LoadOpt(c); ok {
+		return lis, nil
+	}
+	return ListenerParam.Parse("127.0.0.1:6666")
 }

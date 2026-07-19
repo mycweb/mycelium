@@ -12,8 +12,8 @@ import (
 	"go.brendoncarroll.net/exp/slices2"
 	"golang.org/x/exp/constraints"
 
+	"myceliumweb.org/mycelium"
 	"myceliumweb.org/mycelium/internal/bitbuf"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spec"
 )
 
@@ -37,7 +37,7 @@ func (pt *ProgType) SizeOf() int {
 	return int(pt.sizeBytes) * 8
 }
 
-func (pt *ProgType) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (pt *ProgType) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	return nil
 }
 
@@ -147,7 +147,7 @@ func (p *Prog) Size() int {
 	return sum
 }
 
-func (p *Prog) PullInto(ctx context.Context, dst cadata.PostExister, src cadata.Getter) error {
+func (p *Prog) PullInto(ctx context.Context, dst mycelium.WO, src mycelium.RO) error {
 	for _, node := range *p {
 		switch node.code {
 		case spec.LiteralAnyType:

@@ -6,8 +6,6 @@ import (
 
 	"myceliumweb.org/mycelium/internal/testutil"
 
-	"myceliumweb.org/mycelium/internal/cadata"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,10 +26,6 @@ func TestJSONPull(t *testing.T) {
 	val, err := EncodeJSON(node1)
 	require.NoError(t, err)
 	t.Log("encode complete, created", src.Len(), "objects")
-	cadata.ForEach(ctx, src, cadata.Span{}, func(id cadata.ID) error {
-		t.Log(id)
-		return nil
-	})
 	// pull into dst from src
 	dst := testutil.NewStore(t)
 	require.NoError(t, PullJSON(ctx, dst, src, node1))

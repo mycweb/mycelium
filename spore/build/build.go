@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"myceliumweb.org/mycelium"
 	"path"
 	"path/filepath"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/spore/compile"
 	"myceliumweb.org/mycelium/spore/parser"
 	"myceliumweb.org/mycelium/spore/stdlib"
@@ -18,7 +18,7 @@ import (
 
 type Package = compile.Package
 
-func (c *Context) Build(ctx context.Context, dst cadata.PostExister, name string) (*Package, error) {
+func (c *Context) Build(ctx context.Context, dst mycelium.WO, name string) (*Package, error) {
 	if pkg, exists := c.cache[name]; exists {
 		return &pkg, nil
 	}

@@ -20,7 +20,7 @@ var spBuild = star.Command{
 	Metadata: star.Metadata{
 		Short: "builds a myczip package and writes it to a file",
 	},
-	Pos: []star.IParam{outputFileParam, pkgParam},
+	Pos: []star.Positional{&outputFileParam, &pkgParam},
 	F: func(c star.Context) error {
 		ctx := c.Context
 		pkgPath := pkgParam.Load(c)
@@ -48,22 +48,22 @@ func buildZipFile(ctx context.Context, pkgPath string, setEntry bool, out io.Wri
 	return bc.WriteZip(ctx, pkgPath, setEntry, out)
 }
 
-var pkgParam = star.Param[string]{
-	Name:  "pkg",
-	Parse: star.ParseString,
+var pkgParam = star.Required[string]{
+	PosName: "pkg",
+	Parse:   star.ParseString,
 }
 
-var outputFileParam = star.Param[*os.File]{
-	Name:  "o",
-	Parse: os.Create,
+var outputFileParam = star.Required[*os.File]{
+	PosName: "out",
+	Parse:   os.Create,
 }
 
 var spTest = star.Command{
 	Metadata: star.Metadata{
 		Short: "build and run the tests for a package",
 	},
-	Flags: []star.IParam{},
-	Pos:   []star.IParam{pkgParam},
+	Flags: map[string]star.Flag{},
+	Pos:   []star.Positional{&pkgParam},
 	F: func(c star.Context) error {
 		ctx := c.Context
 		pkgPath := pkgParam.Load(c)

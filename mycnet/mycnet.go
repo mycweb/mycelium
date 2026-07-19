@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/stores"
 	"myceliumweb.org/mycelium/mycbytes"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -48,7 +47,7 @@ type AskHandler[T comparable] = func(Addr[T], Artifact) (*Artifact, error)
 // Artifact is a Artifact and store containing all transitively reachable Values
 type Artifact struct {
 	Root  mycbytes.AnyValue
-	Store cadata.Getter
+	Store mycelium.RO
 }
 
 // ArtifactFromMemory creates an Artifact using an in memory Mycelium Value.
@@ -63,7 +62,7 @@ func ArtifactFromMemory(av *myc.AnyValue) Artifact {
 	}
 }
 
-func newArtifact(root []byte, s cadata.Getter) (Artifact, error) {
+func newArtifact(root []byte, s mycelium.RO) (Artifact, error) {
 	if len(root) < len(mycbytes.AnyValue{}) {
 		return Artifact{}, fmt.Errorf("wrong length for AnyValue")
 	}

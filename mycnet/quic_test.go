@@ -4,12 +4,12 @@ import (
 	"net/netip"
 	"testing"
 
+	"blobcache.io/blobcache/src/blobcache"
 	"github.com/cloudflare/circl/sign/ed25519"
 	"github.com/stretchr/testify/require"
 	"go.brendoncarroll.net/p2p/p2ptest"
 
 	"myceliumweb.org/mycelium"
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/internal/testutil"
 	myc "myceliumweb.org/mycelium/mycmem"
 )
@@ -65,21 +65,21 @@ func TestBlobPull(t *testing.T) {
 	h1 := newHost(t, 1, nil, nil)
 	h2 := newHost(t, 2, nil, nil)
 
-	var salt *cadata.ID
+	var salt *mycelium.CID
 	data := []byte("hello world")
 	targetID, err := h2.repo.s.Post(ctx, salt, data)
 	require.NoError(t, err)
 
 	// success
 	buf := make([]byte, 1024)
-	n, err := h1.client.blobPull(ctx, h2.tp.LocalAddr(), &targetID, salt, buf)
+	n, err := h1.client.blobPull(ctx, h2.tp.LocalAddr(), targetID, salt, buf)
 	require.NoError(t, err)
 	require.Equal(t, len(data), n)
 
 	// not found case
 	nfID := mycelium.Hash(salt, []byte("does not exist"))
-	_, err = h1.client.blobPull(ctx, h2.tp.LocalAddr(), &nfID, salt, make([]byte, 100))
-	require.ErrorAs(t, err, &cadata.ErrNotFound{})
+	_, err = h1.client.blobPull(ctx, h2.tp.LocalAddr(), nfID, salt, make([]byte, 100))
+	require.ErrorAs(t, err, &blobcache.ErrNotFound{})
 }
 
 func newHost(t testing.TB, i int, onTell TellHandler[netip.AddrPort], onAsk AskHandler[netip.AddrPort]) *Host[netip.AddrPort] {

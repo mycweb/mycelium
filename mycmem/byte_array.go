@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"myceliumweb.org/mycelium"
 	"slices"
-
-	"myceliumweb.org/mycelium/internal/cadata"
 )
 
 // ByteArray is an optimized implementation of Array[Array[Bit, 8], n]
@@ -89,7 +88,7 @@ func (ba ByteArray) Components() iter.Seq[Value] {
 	return emptyIter
 }
 
-func (ByteArray) PullInto(context.Context, cadata.PostExister, cadata.Getter) error {
+func (ByteArray) PullInto(context.Context, mycelium.WO, mycelium.RO) error {
 	return nil
 }
 

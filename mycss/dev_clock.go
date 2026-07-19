@@ -2,10 +2,10 @@ package mycss
 
 import (
 	"context"
+	"myceliumweb.org/mycelium"
 
 	"go.brendoncarroll.net/tai64"
 
-	"myceliumweb.org/mycelium/internal/cadata"
 	"myceliumweb.org/mycelium/mvm1"
 	"myceliumweb.org/mycelium/myccanon"
 	myc "myceliumweb.org/mycelium/mycmem"
@@ -40,7 +40,7 @@ func CurrentTimeExpr(clk *Expr) *Expr {
 type wallClockDev struct {
 }
 
-func (cs wallClockDev) portInput(ctx context.Context, _ cadata.PostExister, buf []mvm1.Word) error {
+func (cs wallClockDev) portInput(ctx context.Context, _ mycelium.WO, buf []mvm1.Word) error {
 	ts := tai64.Now()
 	buf[0] = uint32(ts.Seconds)
 	buf[1] = uint32(ts.Nanoseconds)
