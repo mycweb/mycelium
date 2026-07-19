@@ -1,0 +1,7 @@
+.{
+    .name = .mvm2,
+    .version = "0.0.1",
+    .minimum_zig_version = "0.16.0",
+    .paths = .{""},
+    .fingerprint = 0xa0f0a04a394ff117,
+}

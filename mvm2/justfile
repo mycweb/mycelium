@@ -1,0 +1,5 @@
+zig-build:
+	zig build-lib -femit-bin=libmvm2zig.a root.zig
+
+test: zig-build
+	go test .
